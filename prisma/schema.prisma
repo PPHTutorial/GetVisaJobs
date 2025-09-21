@@ -1,0 +1,436 @@
+// UK Visa Jobs - Job Listing and Recruitment Platform Database Schema
+// Comprehensive schema for job listings, user management, events, blogs, and admin functionality
+// Version: 1.0.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+  EMPLOYER
+}
+
+enum JobType {
+  STUDENT
+  GRADUATE
+  EXPERIENCED
+  INTERNSHIP
+  APPRENTICESHIP
+  CONTRACT
+  TEMPORARY
+  VOLUNTEER
+  PART_TIME
+  FULL_TIME
+  REMOTE
+  ON_SITE
+  HYBRID
+  FREELANCE
+  OTHER
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  INTERVIEWED
+  ACCEPTED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum EventType {
+  WEBINAR
+  WORKSHOP
+  SEMINAR
+  NETWORKING
+  CONFERENCE
+  MEETUP
+  JOB_HUNTING
+  JOB_FAIR
+
+}
+
+enum FileType {
+  IMAGE
+  DOCUMENT
+  VIDEO
+}
+
+enum SalaryMode {
+  COMPETITIVE
+  FIXED
+  RANGE
+}
+
+enum ApplicationMethod {
+  EXTERNAL
+  INTERNAL
+}
+
+// User Management
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String?
+  firstName         String
+  otherNames        String?
+  lastName          String
+  phone             String?
+  role              UserRole  @default(USER)
+  emailVerified     Boolean   @default(false)
+  phoneVerified     Boolean   @default(false)
+  avatar            String?
+  bio               String?
+  linkedinUrl       String?
+  resumeUrl         String?
+  currentLocation   String?
+  preferredLocation String?
+  experienceYears   Int?
+  degree            String?
+  university        String?
+  graduationYear    Int?
+  skills            String[] // Array of skills
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  applications       JobApplication[]
+  savedJobs          SavedJob[]
+  notifications      Notification[]
+  reviews            Review[]
+  payments           Payment[]
+  adminActions       AdminAction[]
+  employerProfile    EmployerProfile?
+  eventRegistrations EventRegistration[]
+  authoredBlogs      Blog[]
+  uploadedFiles      File[]
+  refreshTokens      RefreshToken[]
+
+  @@map("users")
+}
+
+// Refresh Token Management
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  token       String    @unique
+  deviceInfo  String?   // Browser, device, IP info for security
+  isRevoked   Boolean   @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  lastUsedAt  DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model EmployerProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  companyName String
+  companySize String?
+  industry    String?
+  website     String?
+  description String?
+  logo        String?
+  address     String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs Job[]
+
+  @@map("employer_profiles")
+}
+
+// Job Management
+model Job {
+  id                  String    @id @default(cuid())
+  title               String
+  description         String
+  requirements        String?
+  responsibilities    String?
+  benefits            String?
+  company             String
+  logo                String?
+  location            String // Full location string for display
+  country             String?
+  state               String?
+  city                String?
+  jobType             JobType
+  employmentType      String // Full-time, Part-time, Contract
+  experienceLevel     String?
+  salaryMin           Int?
+  salaryMax           Int?
+  salaryCurrency      String    @default("GBP")
+  salaryType          String    @default("Yearly") // Yearly, Monthly, Hourly
+  salaryMode          SalaryMode @default(RANGE)
+  degreeRequired      String?
+  skillsRequired      String[]
+  applicationUrl      String?
+  applicationEmail    String?
+  applicationDeadline DateTime?
+  applicationMethod   ApplicationMethod @default(INTERNAL)
+  isActive            Boolean   @default(true)
+  isFeatured          Boolean   @default(false)
+  viewCount           Int       @default(0)
+  applicationCount    Int       @default(0)
+  employerId          String?
+  categoryId          String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relations
+  employer     EmployerProfile? @relation(fields: [employerId], references: [id])
+  category     Category?        @relation(fields: [categoryId], references: [id])
+  applications JobApplication[]
+  savedBy      SavedJob[]
+  reviews      Review[]
+
+  @@map("jobs")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  type        String // job, blog, event
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  jobs   Job[]
+  blogs  Blog[]
+  events Event[]
+
+  @@map("categories")
+}
+
+model JobApplication {
+  id          String            @id @default(cuid())
+  userId      String
+  jobId       String
+  status      ApplicationStatus @default(PENDING)
+  coverLetter String?
+  resumeUrl   String?
+  appliedAt   DateTime          @default(now())
+  reviewedAt  DateTime?
+  notes       String?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@map("job_applications")
+}
+
+model SavedJob {
+  id      String   @id @default(cuid())
+  userId  String
+  jobId   String
+  savedAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@map("saved_jobs")
+}
+
+// Event Management
+model Event {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  eventType       EventType
+  startDate       DateTime
+  endDate         DateTime?
+  location        String?
+  isVirtual       Boolean   @default(true)
+  virtualLink     String?
+  capacity        Int?
+  registeredCount Int       @default(0)
+  isActive        Boolean   @default(true)
+  isFeatured      Boolean   @default(false)
+  imageUrl        String?
+  categoryId      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  category      Category?           @relation(fields: [categoryId], references: [id])
+  registrations EventRegistration[]
+
+  @@map("events")
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  userId       String
+  eventId      String
+  registeredAt DateTime @default(now())
+  attended     Boolean  @default(false)
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@map("event_registrations")
+}
+
+// Blog Management
+model Blog {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  excerpt     String?
+  authorId    String
+  imageUrl    String?
+  tags        String[]
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  viewCount   Int       @default(0)
+  categoryId  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  author   User      @relation(fields: [authorId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("blogs")
+}
+
+// Review System
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  jobId      String?
+  companyId  String?
+  rating     Int // 1-5 stars
+  title      String
+  content    String
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job? @relation(fields: [jobId], references: [id])
+
+  @@map("reviews")
+}
+
+// Payment System
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  amount        Float
+  currency      String        @default("GBP")
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String?
+  transactionId String?
+  description   String?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+// File Management
+model File {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  fileType     FileType
+  uploadedBy   String
+  isPublic     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  uploader User @relation(fields: [uploadedBy], references: [id])
+
+  @@map("files")
+}
+
+// Notification System
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String // application_update, job_alert, event_reminder, etc.
+  isRead    Boolean  @default(false)
+  data      Json? // Additional data for the notification
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Admin Actions Log
+model AdminAction {
+  id           String   @id @default(cuid())
+  adminId      String
+  action       String // create, update, delete, approve, reject, etc.
+  resourceType String // job, user, event, blog, etc.
+  resourceId   String
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@map("admin_actions")
+}
+
+// Statistics and Analytics
+model Statistic {
+  id        String   @id @default(cuid())
+  type      String // jobs_posted, applications_received, users_registered, etc.
+  value     Int
+  date      DateTime
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@unique([type, date])
+  @@map("statistics")
+}

@@ -71,7 +71,7 @@ export default function JobDetailsPage() {
     return (
       <div className="min-h-screen">
         <NavbarComponent />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center py-12">
             <div className="text-gray-600">Loading job details...</div>
           </div>
@@ -85,7 +85,7 @@ export default function JobDetailsPage() {
     return (
       <div className="min-h-screen">
         <NavbarComponent />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center py-12">
             <div className="text-red-600 mb-4">{error || 'Job not found'}</div>
             <Button onClick={() => router.push('/jobs')}>
@@ -103,7 +103,7 @@ export default function JobDetailsPage() {
     <div className="min-h-screen">
       <NavbarComponent />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Button
           variant="ghost"

@@ -13,6 +13,9 @@ export interface Job {
   isFeatured: boolean
   logo?: string
   viewCount: number
+  employmentType?: string
+  jobType?: string
+  experienceLevel: string
   employer?: {
     companyName: string
     user: {

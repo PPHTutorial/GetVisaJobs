@@ -427,7 +427,7 @@ export function DataTable<T extends Record<string, any>>({
                             <SelectTrigger className="w-20">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white">
                                 <SelectItem value="5">5</SelectItem>
                                 <SelectItem value="10">10</SelectItem>
                                 <SelectItem value="20">20</SelectItem>

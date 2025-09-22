@@ -53,6 +53,24 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || ''
     const status = searchParams.get('status') // 'active', 'inactive', or 'all'
 
+    // New filter parameters
+    const categoryId = searchParams.get('categoryId')
+    const location = searchParams.get('location')
+    const country = searchParams.get('country')
+    const state = searchParams.get('state')
+    const city = searchParams.get('city')
+    const jobTypes = searchParams.get('jobTypes')?.split(',') || []
+    const employmentType = searchParams.get('employmentType')
+    const experienceLevel = searchParams.get('experienceLevel')
+    const salaryMin = searchParams.get('salaryMin')
+    const salaryMax = searchParams.get('salaryMax')
+    const degreeRequired = searchParams.get('degreeRequired')
+    const skills = searchParams.get('skills')?.split(',') || []
+    const applicationMethod = searchParams.get('applicationMethod')
+    const isFeatured = searchParams.get('isFeatured') === 'true'
+    const sortBy = searchParams.get('sortBy') || 'createdAt'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
+
     const skip = (page - 1) * limit
 
     // Build where clause
@@ -71,6 +89,85 @@ export async function GET(request: NextRequest) {
       where.isActive = true
     } else if (status === 'inactive') {
       where.isActive = false
+    }
+
+    // Add new filters
+    if (categoryId) {
+      where.categoryId = categoryId
+    }
+
+    if (location) {
+      where.location = { contains: location, mode: 'insensitive' }
+    }
+
+    if (country) {
+      where.country = { contains: country, mode: 'insensitive' }
+    }
+
+    if (state) {
+      where.state = { contains: state, mode: 'insensitive' }
+    }
+
+    if (city) {
+      where.city = { contains: city, mode: 'insensitive' }
+    }
+
+    if (jobTypes.length > 0) {
+      where.jobType = { in: jobTypes }
+    }
+
+    if (employmentType) {
+      where.employmentType = employmentType
+    }
+
+    if (experienceLevel) {
+      where.experienceLevel = experienceLevel
+    }
+
+    if (salaryMin) {
+      where.salaryMin = { gte: parseInt(salaryMin) }
+    }
+
+    if (salaryMax) {
+      where.salaryMax = { lte: parseInt(salaryMax) }
+    }
+
+    if (degreeRequired) {
+      where.degreeRequired = degreeRequired
+    }
+
+    if (skills.length > 0) {
+      where.skillsRequired = { hasSome: skills }
+    }
+
+    if (applicationMethod) {
+      where.applicationMethod = applicationMethod
+    }
+
+    if (isFeatured) {
+      where.isFeatured = true
+    }
+
+    // Build orderBy
+    const orderBy: any = {}
+    switch (sortBy) {
+      case 'createdAt':
+        orderBy.createdAt = sortOrder
+        break
+      case 'salaryMin':
+        orderBy.salaryMin = sortOrder
+        break
+      case 'salaryMax':
+        orderBy.salaryMax = sortOrder
+        break
+      case 'title':
+        orderBy.title = sortOrder
+        break
+      case 'company':
+        orderBy.company = sortOrder
+        break
+      default:
+        orderBy.createdAt = 'desc'
     }
 
     const [jobs, total] = await Promise.all([
@@ -94,11 +191,9 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
-       //skip,
-//take: limit,
+        orderBy,
+        skip,
+        take: limit,
       }),
       prisma.job.count({ where }),
     ])

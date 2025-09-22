@@ -153,7 +153,6 @@ export default function EventsPage() {
     }
   }
 
-
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -386,122 +385,123 @@ export default function EventsPage() {
               <DialogTitle>Create New Event</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreateEvent} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4 max-h-[80vh] overflow-y-scroll p-4 -mx-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="imageUrl">Image URL</Label>
                   <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    id="imageUrl"
+                    placeholder='Image URL: https://example.com/banner.jpg'
+                    value={formData.imageUrl}
+                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  placeholder='Image URL: https://example.com/banner.jpg'
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Virtual Link</Label>
-                <Input
-                  id="virtualLink"
-                  placeholder='Virtual Link: https://example.com/virtual-event'
-                  value={formData.virtualLink}
-                  onChange={(e) => setFormData({ ...formData, virtualLink: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isVirtual"
-                    checked={formData.isVirtual}
-                    onChange={(e) => setFormData({ ...formData, isVirtual: e.target.checked })}
-                    className="rounded border-gray-300 accent-accent"
-                  />
-                  <Label htmlFor="isVirtual">Fully Virtual</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isFeatured"
-                    checked={formData.isFeatured}
-                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                    className="rounded border-gray-300 accent-accent"
-                  />
-                  <Label htmlFor="isFeatured">Featured</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="rounded border-gray-300 accent-accent"
-                  />
-                  <Label htmlFor="isActive">Active</Label>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date & Time</Label>
-                  <Input
-                    id="startDate"
-                    type="datetime-local"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date & Time</Label>
+                  <Label htmlFor="category">Virtual Link</Label>
                   <Input
-                    id="endDate"
-                    type="datetime-local"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    id="virtualLink"
+                    placeholder='Virtual Link: https://example.com/virtual-event'
+                    value={formData.virtualLink}
+                    onChange={(e) => setFormData({ ...formData, virtualLink: e.target.value })}
                     required
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity</Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    value={formData.capacity}
-                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                    required
-                  />
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isVirtual"
+                      checked={formData.isVirtual}
+                      onChange={(e) => setFormData({ ...formData, isVirtual: e.target.checked })}
+                      className="rounded border-gray-300 accent-accent"
+                    />
+                    <Label htmlFor="isVirtual">Fully Virtual</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isFeatured"
+                      checked={formData.isFeatured}
+                      onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                      className="rounded border-gray-300 accent-accent"
+                    />
+                    <Label htmlFor="isFeatured">Featured</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      className="rounded border-gray-300 accent-accent"
+                    />
+                    <Label htmlFor="isActive">Active</Label>
+                  </div>
                 </div>
-                {/* <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date & Time</Label>
+                    <Input
+                      id="startDate"
+                      type="datetime-local"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">End Date & Time</Label>
+                    <Input
+                      id="endDate"
+                      type="datetime-local"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="capacity">Capacity</Label>
+                    <Input
+                      id="capacity"
+                      type="number"
+                      value={formData.capacity}
+                      onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {/* <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
                     <SelectTrigger>
@@ -514,106 +514,107 @@ export default function EventsPage() {
                     </SelectContent>
                   </Select>
                 </div> */}
-                <div className="space-y-2 ">
-                  <Label htmlFor="eventType">Event Type</Label>
-                  <Select value={formData.eventType} onValueChange={(value) => setFormData({ ...formData, eventType: value as any })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Event Type" />
-                    </SelectTrigger>
-                    <SelectContent className='bg-white border border-input'>
-                      <SelectItem value="JOB_FAIR">Job Fair</SelectItem>
-                      <SelectItem value="WEBINAR">Webinar</SelectItem>
-                      <SelectItem value="NETWORKING">Networking</SelectItem>
-                      <SelectItem value="JOB_HUNTING">Job Hunting</SelectItem>
-                      <SelectItem value="CONFERENCE">Conference</SelectItem>
-                      <SelectItem value="MEETUP">Meetup</SelectItem>
-                      <SelectItem value="SEMINAR">Seminar</SelectItem>
-                      <SelectItem value="WORKSHOP">Workshop</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2 col-span-2 lg:col-span-1">
-                  <Label htmlFor="categoryId">Category</Label>
-                  <div className="flex gap-2">
-                    <Select onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select category" />
+                  <div className="space-y-2 ">
+                    <Label htmlFor="eventType">Event Type</Label>
+                    <Select value={formData.eventType} onValueChange={(value) => setFormData({ ...formData, eventType: value as any })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Event Type" />
                       </SelectTrigger>
                       <SelectContent className='bg-white border border-input'>
-                        {categories.map((category) => (
-                          <SelectItem key={category?.id || Date.now().toLocaleString()} value={category?.id || Date.now().toLocaleString()}>
-                            {category?.name || ''}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="JOB_FAIR">Job Fair</SelectItem>
+                        <SelectItem value="WEBINAR">Webinar</SelectItem>
+                        <SelectItem value="NETWORKING">Networking</SelectItem>
+                        <SelectItem value="JOB_HUNTING">Job Hunting</SelectItem>
+                        <SelectItem value="CONFERENCE">Conference</SelectItem>
+                        <SelectItem value="MEETUP">Meetup</SelectItem>
+                        <SelectItem value="SEMINAR">Seminar</SelectItem>
+                        <SelectItem value="WORKSHOP">Workshop</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button type="button" variant="outline" size="icon">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Create New Category</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleCreateCategory} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="categoryName">Name *</Label>
-                            <Input
-                              id="categoryName"
-                              value={categoryFormData.name}
-                              onChange={(e) => handleCategoryNameChange(e.target.value)}
-                              required
-                            />
-                            {categorySlugPreview && (
-                              <p className="text-sm text-muted-foreground">
-                                Slug: <code className="bg-gray-100 px-1 rounded">{categorySlugPreview}</code>
-                              </p>
-                            )}
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="categoryDescription">Description</Label>
-                            <Textarea
-                              id="categoryDescription"
-                              value={categoryFormData.description}
-                              onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
-                              rows={3}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="categoryType">Type *</Label>
-                            <Select value={categoryFormData.type} onValueChange={(value) => setCategoryFormData({ ...categoryFormData, type: value as any })}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className='bg-white border border-input'>
-                                <SelectItem value="job">Jobs</SelectItem>
-                                <SelectItem value="event">Events</SelectItem>
-                                <SelectItem value="blog">Blogs</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="categoryIsActive"
-                              checked={categoryFormData.isActive}
-                              onChange={(e) => setCategoryFormData({ ...categoryFormData, isActive: e.target.checked })}
-                              className="rounded accent-accent"
-                            />
-                            <Label htmlFor="categoryIsActive">Active</Label>
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>
-                              Cancel
-                            </Button>
-                            <Button type="submit">Create Category</Button>
-                          </div>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                  </div>
+
+                  <div className="space-y-2 col-span-2 lg:col-span-1">
+                    <Label htmlFor="categoryId">Category</Label>
+                    <div className="flex gap-2">
+                      <Select onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent className='bg-white border border-input'>
+                          {categories.map((category) => (
+                            <SelectItem key={category?.id || Date.now().toLocaleString()} value={category?.id || Date.now().toLocaleString()}>
+                              {category?.name || ''}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline" size="icon">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Create New Category</DialogTitle>
+                          </DialogHeader>
+                          <form onSubmit={handleCreateCategory} className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="categoryName">Name *</Label>
+                              <Input
+                                id="categoryName"
+                                value={categoryFormData.name}
+                                onChange={(e) => handleCategoryNameChange(e.target.value)}
+                                required
+                              />
+                              {categorySlugPreview && (
+                                <p className="text-sm text-muted-foreground">
+                                  Slug: <code className="bg-gray-100 px-1 rounded">{categorySlugPreview}</code>
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="categoryDescription">Description</Label>
+                              <Textarea
+                                id="categoryDescription"
+                                value={categoryFormData.description}
+                                onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
+                                rows={3}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="categoryType">Type *</Label>
+                              <Select value={categoryFormData.type} onValueChange={(value) => setCategoryFormData({ ...categoryFormData, type: value as any })}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className='bg-white border border-input'>
+                                  <SelectItem value="job">Jobs</SelectItem>
+                                  <SelectItem value="event">Events</SelectItem>
+                                  <SelectItem value="blog">Blogs</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id="categoryIsActive"
+                                checked={categoryFormData.isActive}
+                                onChange={(e) => setCategoryFormData({ ...categoryFormData, isActive: e.target.checked })}
+                                className="rounded accent-accent"
+                              />
+                              <Label htmlFor="categoryIsActive">Active</Label>
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                              <Button type="button" variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>
+                                Cancel
+                              </Button>
+                              <Button type="submit">Create Category</Button>
+                            </div>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -623,6 +624,8 @@ export default function EventsPage() {
                 </Button>
                 <Button type="submit">Create Event</Button>
               </div>
+
+
             </form>
           </DialogContent>
         </Dialog>
@@ -650,81 +653,83 @@ export default function EventsPage() {
             <DialogTitle>Edit Event</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdateEvent} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4 max-h-[80vh] overflow-y-scroll p-4 -mx-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-title">Title</Label>
+                  <Input
+                    id="edit-title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-location">Location</Label>
+                  <Input
+                    id="edit-location"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-title">Title</Label>
-                <Input
-                  id="edit-title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-location">Location</Label>
-                <Input
-                  id="edit-location"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-startDate">Start Date & Time</Label>
+                  <Input
+                    id="edit-startDate"
+                    type="datetime-local"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-endDate">End Date & Time</Label>
+                  <Input
+                    id="edit-endDate"
+                    type="datetime-local"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-startDate">Start Date & Time</Label>
-                <Input
-                  id="edit-startDate"
-                  type="datetime-local"
-                  value={formData.startDate}
-                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-endDate">End Date & Time</Label>
-                <Input
-                  id="edit-endDate"
-                  type="datetime-local"
-                  value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-capacity">Capacity</Label>
-                <Input
-                  id="edit-capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-category">Category</Label>
-                <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className='bg-white border border-input'>
-                    <SelectItem value="1">Job Fair</SelectItem>
-                    <SelectItem value="2">Webinar</SelectItem>
-                    <SelectItem value="3">Networking</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-capacity">Capacity</Label>
+                  <Input
+                    id="edit-capacity"
+                    type="number"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-category">Category</Label>
+                  <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className='bg-white border border-input'>
+                      <SelectItem value="1">Job Fair</SelectItem>
+                      <SelectItem value="2">Webinar</SelectItem>
+                      <SelectItem value="3">Networking</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <div className="flex justify-end space-x-2">
@@ -733,6 +738,7 @@ export default function EventsPage() {
               </Button>
               <Button type="submit">Update Event</Button>
             </div>
+
           </form>
         </DialogContent>
       </Dialog>

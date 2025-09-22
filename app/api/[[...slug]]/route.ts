@@ -398,6 +398,39 @@ const handlers = {
     }
   },
 
+  async getBlog(request: NextRequest, params: string[]) {
+    try {
+      const blogId = params[1]
+
+      const blog = await prisma.blog.findUnique({
+        where: { id: blogId, isPublished: true },
+        include: {
+          author: {
+            select: { firstName: true, lastName: true, email: true }
+          },
+          category: true
+        }
+      })
+
+      if (!blog) {
+        return NextResponse.json(
+          { success: false, message: 'Blog not found' } as ApiResponse,
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: blog
+      } as ApiResponse)
+    } catch (_error) {
+      return NextResponse.json(
+        { success: false, message: 'Failed to fetch blog' } as ApiResponse,
+        { status: 500 }
+      )
+    }
+  },
+
   // Dashboard stats
   async getDashboardStats(request: NextRequest) {
     try {
@@ -489,7 +522,11 @@ export async function GET(
       case 'events':
         return await handlers.getEvents(request)
       case 'blogs':
-        return await handlers.getBlogs(request)
+        if (id) {
+          return await handlers.getBlog(request, slug)
+        } else {
+          return await handlers.getBlogs(request)
+        }
       case 'dashboard':
         if (slug[1] === 'stats') {
           return await handlers.getDashboardStats(request)

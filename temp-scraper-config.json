@@ -1,0 +1,1 @@
+{"linkedinEmail":"appdevlap@gmail.com","linkedinPassword":"123456","locations":["United States","United Kingdom","Canada","Australia","Ghana"],"scrapeTypes":["jobs","events","people","articles"],"maxPages":500,"delayBetweenRequests":2000,"isRunning":false,"progress":{"jobs":0,"events":0,"people":0,"articles":0},"lastRun":null}

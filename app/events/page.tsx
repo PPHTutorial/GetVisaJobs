@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Calendar, Users, Search, Clock, Video } from 'lucide-react'
+import { MapPin, Calendar, Users, Search, Clock, Video, Star } from 'lucide-react'
 import NavbarComponent from '@/components/ui/navbar'
 import Footer from '@/components/footer'
 
@@ -136,15 +136,11 @@ export default function EventsPage() {
 
   if (loading && events.length === 0) {
     return (
-      <div className="min-h-screen">
-        <NavbarComponent />
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading events...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Getting Data</p>
         </div>
-        <Footer />
       </div>
     )
   }
@@ -178,7 +174,7 @@ export default function EventsPage() {
             </p>
 
             <div className="mt-8 flex justify-center space-x-4">
-              <div className=" min-w-96">
+              <div className="relative min-w-96">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400 " />
                 <Input
                   placeholder="Event title or description"
@@ -323,56 +319,63 @@ export default function EventsPage() {
                           </div>
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="text-xl font-bold text-gray-900 line-clamp-2">
+                          <div className="flex items-start justify-between mb-1">
+                            <h3 className="text-base font-bold text-gray-900 line-clamp-2">
                               {event.title}
                             </h3>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs border-input">
+                              {event.eventType.replace('_', ' ')}
+                            </Badge>
+                            {event.category && (
+                              <Badge variant="secondary" className="text-xs border-ring">
+                                {event.category.name}
+                              </Badge>
+                            )}
                             {event.isFeatured && (
-                              <Badge className="bg-blue-500 text-white ml-2">Featured</Badge>
+                              <Star className="text-yellow-500 size-4" />
                             )}
                           </div>
-
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 space-y-2 mt-4 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          {formatEventDate(event.startDate, event.endDate)}
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2" />
-                          {formatEventTime(event.startDate)}
-                        </div>
-                        <div className="flex items-center">
-                          {event.isVirtual ? (
-                            <>
-                              <Video className="w-4 h-4 mr-2" />
-                              <span>Virtual Event</span>
-                            </>
-                          ) : (
-                            <>
-                              <MapPin className="w-4 h-4 mr-2" />
-                              <span>{event.location || 'Location TBA'}</span>
-                            </>
-                          )}
-                        </div>
-                        {event.capacity && (
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-2" />
-                            <span>{event.registeredCount}/{event.capacity} registered</span>
+                      <div className="relative grid space-y-2 my-6 text-sm text-gray-600">
+                        <div className='space-y-2'>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center">
+                              <Calendar className="w-4 h-4 mr-2" />
+                              {formatEventDate(event.startDate, event.endDate)}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="w-4 h-4 mr-2" />
+                              {formatEventTime(event.startDate)}
+                            </div>
                           </div>
-                        )}
-                      </div>
-
-                      <div className="mt-4">
-                        <Badge variant="outline" className="text-xs">
-                          {event.eventType.replace('_', ' ')}
-                        </Badge>
-                        {event.category && (
-                          <Badge variant="secondary" className="text-xs ml-2">
-                            {event.category.name}
-                          </Badge>
-                        )}
+                          <div className="flex items-center">
+                            {event.isVirtual ? (
+                              <>
+                                <Video className="w-4 h-4 mr-2" />
+                                <span>Virtual Event</span>
+                              </>
+                            ) : (
+                              <>
+                                <MapPin className="w-4 h-4 mr-2" />
+                                <span>{event.location || 'Location TBA'}</span>
+                              </>
+                            )}
+                          </div>
+                          <div>
+                            {event.capacity && (
+                              <div className="flex items-center">
+                                <Users className="w-4 h-4 mr-2" />
+                                <span>{event.registeredCount}/{event.capacity} registered</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <Button variant="default" className="mt-4 self-start font-bold">
+                          Attend Meeting
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

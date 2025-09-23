@@ -134,15 +134,11 @@ export default function ResourcesPage() {
 
   if (loading && blogs.length === 0) {
     return (
-      <div className="min-h-screen">
-        <NavbarComponent />
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading resources...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Getting Data</p>
         </div>
-        <Footer />
       </div>
     )
   }

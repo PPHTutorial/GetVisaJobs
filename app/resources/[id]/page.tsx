@@ -105,22 +105,18 @@ export default function BlogDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
-        <NavbarComponent />
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading article...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Getting Data</p>
         </div>
-        <Footer />
       </div>
     )
   }
 
   if (error || !blog) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-full">
         <NavbarComponent />
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
@@ -136,20 +132,12 @@ export default function BlogDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-full">
       <NavbarComponent />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-green-50 to-green-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/resources')}
-            className="mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Resources
-          </Button>
 
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -166,12 +154,6 @@ export default function BlogDetailsPage() {
             </div>
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{blog.title}</h1>
-
-            {blog.excerpt && (
-              <p className="text-base text-gray-600 max-w-2xl mx-auto mb-6">
-                {blog.excerpt}
-              </p>
-            )}
 
             <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
               <div className="flex items-center">
@@ -218,6 +200,11 @@ export default function BlogDetailsPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="prose prose-lg max-w-none">
+                    {blog.excerpt && (
+                      <p className="text-base text-gray-600 mb-6">
+                        {blog.excerpt}
+                      </p>
+                    )}
                     <div
                       className="text-gray-700 leading-relaxed"
                       dangerouslySetInnerHTML={{
@@ -292,17 +279,17 @@ export default function BlogDetailsPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Views</span>
+                    <span className="text-sm text-gray-600">Views: </span>
                     <span className="font-semibold">{blog.viewCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Published</span>
-                    <span className="font-semibold text-sm">
+                    <span className="text-sm text-gray-600">Published: </span>
+                    <span className="font-semibold text-sm text-right">
                       {formatDate(blog.publishedAt || blog.createdAt)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Reading Time</span>
+                    <span className="text-sm text-gray-600">Reading Time: </span>
                     <span className="font-semibold text-sm">
                       {getReadingTime(blog.content)}
                     </span>

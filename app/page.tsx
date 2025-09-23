@@ -1,7 +1,9 @@
 ﻿/* eslint-disable @next/next/no-img-element */
+
 'use client'
 
 import { Button } from '../components/ui/button'
+import Link from 'next/link'
 import { Card, CardContent } from '../components/ui/card'
 import { useEffect, useState } from 'react'
 import { MapPin, Bookmark, GraduationCap, BriefcaseBusiness } from 'lucide-react'
@@ -23,6 +25,63 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Typing animation state
+  const [currentWordIndex, setCurrentWordIndex] = useState(0)
+  const [currentCharIndex, setCurrentCharIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [displayText, setDisplayText] = useState('')
+
+
+  // Typing animation effect
+  useEffect(() => {
+    const jobTypes = [
+      'Dream Job!',
+      'Visa Aided Job!',
+      'Remote Job!',
+      'Full-Time Job!',
+      'Part-Time Job!',
+      'Contract Job!',
+      'Hybrid Job!',
+      'Student Job!',
+      'Internship!',
+      'Graduate Role!',
+      'Entry Level Job!',
+      'Senior Position!',
+      'Tech Job!',
+      'Global Career Job!'
+    ]
+    const currentWord = jobTypes[currentWordIndex]
+    const typingSpeed = isDeleting ? 50 : 100
+    const pauseTime = 2000 // Pause before deleting
+
+    const timer = setTimeout(() => {
+      if (!isDeleting) {
+        // Typing
+        if (currentCharIndex < currentWord.length) {
+          setDisplayText(currentWord.slice(0, currentCharIndex + 1))
+          setCurrentCharIndex(prev => prev + 1)
+        } else {
+          // Word complete, pause then start deleting
+          setTimeout(() => setIsDeleting(true), pauseTime)
+        }
+      } else {
+        // Deleting
+        if (currentCharIndex > 0) {
+          setDisplayText(currentWord.slice(0, currentCharIndex - 1))
+          setCurrentCharIndex(prev => prev - 1)
+        } else {
+          // Word deleted, move to next word
+          setIsDeleting(false)
+          setCurrentWordIndex(prev => (prev + 1) % jobTypes.length)
+        }
+      }
+    }, typingSpeed)
+
+    return () => clearTimeout(timer)
+  }, [currentWordIndex, currentCharIndex, isDeleting])
+
+
   useEffect(() => {
     async function fetchHomepageData() {
       try {
@@ -58,7 +117,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading homepage...</p>
+          <p className="text-gray-600">Getting Data</p>
         </div>
       </div>
     )
@@ -89,20 +148,24 @@ export default function Home() {
       <NavbarComponent />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-emerald-50/10 to-emerald-100/20 py-20">
+      <section className="relative bg-gradient-to-br from-emerald-50/10 to-emerald-100/20 py-10 md:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center place-content-center">
             {/* Left Content */}
-            <div className="space-y-4">
-              <h1 className="text-4xl text-gray-900 leading-tight font-extrabold">
-                Just few clicks away from
-                <br />
-                <span className="text-primary font-extrabold text-7xl">Securing Your Dream Job!</span>
+            <div className="flex flex-col items-center lg:items-start">
+              <h1 className="text-3xl md:text-5xl lg:text-4xl text-gray-900 leading-tight font-extrabold">
+                Just few clicks away
               </h1>
+              <h1 className="text-primary font-extrabold text-5xl md:text-7xl">Securing Your</h1>
+              <div className="min-h-[80px] flex items-center">
+                <h1 className="text-primary font-extrabold text-5xl md:text-7xl border-r-4 border-primary">
+                  {displayText}
+                </h1>
+              </div>
 
-              <p className="text-xl text-gray-600 leading-relaxed">
-                Apply for student, graduate & experienced hire jobs with visa
-                sponsorship across the globe.
+              <p className="text-base md:text-2xl lg:text-xl text-center lg:text-right text-gray-600 leading-snug lg:leading-relaxed">
+                Apply for remote, student, graduate, experienced, internship,.. <br />
+                Get hired with Visa sponsored and high paid jobs across the globe.
               </p>
 
               {/* Statistics */}
@@ -123,17 +186,23 @@ export default function Home() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4 pt-6">
-                <Button className="bg-primary hover:bg-emerald-700 text-white px-8 py-3 text-lg">
-                  Search Jobs
-                </Button>
-                <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50 px-8 py-3 text-lg">
-                  Subscribe
-                </Button>
+
+                <Link href="/jobs" >
+                  <Button className="bg-primary hover:bg-emerald-700 text-white px-8 py-3 text-lg">
+                    Search Jobs
+                  </Button>
+                </Link>
+
+                <Link href="/subscription" >
+                  <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50 px-8 py-3 text-lg">
+                    Subscribe
+                  </Button>
+                </Link>
               </div>
             </div>
 
             {/* Right Illustration */}
-            <div className="relative">
+            <div className="hidden lg:flex justify-center relative">
               <img src="./hero.svg" alt="hero illustration" className="w-150 h-auto" />
             </div>
           </div>
@@ -143,31 +212,17 @@ export default function Home() {
       {/* Partners Section */}
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-orange-500">pwc</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-primary">NHS</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-red-600">HSBC</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-gray-800">Deloitte.</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-lg font-bold text-gray-800">MOTT MACDONALD</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-emerald-500">BARCLAYS</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-yellow-500">EY</span>
-            </div>
-            <div className="h-12 flex items-center">
-              <span className="text-2xl font-bold text-gray-800">Bloomberg</span>
-            </div>
+          <p className='text-center text-gray-900 mb-6 font-extrabold text-4xl'>Trusted by companies worldwide</p>
+          <div className="flex flex-wrap items-center justify-center gap-8">
+            {['google', 'microsoft', 'airbnb', 'uber', 'lyft', 'doordash'].map((company) => (
+              <div key={company} className="flex items-center justify-center h-12">
+                <img
+                  src={`./partners/${company}.svg`}
+                  alt={`${company} logo`}
+                  className="h-8 object-contain grayscale opacity-60 hover:opacity-100 transition-opacity"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -186,9 +241,9 @@ export default function Home() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                       <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
-                          {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
-                        </div>
+                      <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
+                        {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
+                      </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-extrabold text-gray-900">
                           {job.title}

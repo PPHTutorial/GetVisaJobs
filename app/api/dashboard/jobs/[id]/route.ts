@@ -103,6 +103,7 @@ export async function GET(
         salaryMax: job.salaryMax,
         salaryCurrency: job.salaryCurrency,
         salaryType: job.salaryType,
+        salaryMode: job.salaryMode,
         degreeRequired: job.degreeRequired,
         skillsRequired: job.skillsRequired,
         applicationUrl: job.applicationUrl,

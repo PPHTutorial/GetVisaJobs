@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Play, Pause, Settings, BarChart3, AlertCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface ScraperConfig {
   linkedinEmail: string
@@ -20,6 +21,8 @@ interface ScraperConfig {
   maxPages: number
   delayBetweenRequests: number
   isRunning: boolean
+  headless: boolean
+  datePostedFilter: 'any' | 'past-24h' | 'past-week' | 'past-month' | 'past-3months' | 'past-6months' | 'past-year'
   progress: {
     jobs: number
     events: number
@@ -69,6 +72,8 @@ export default function ScraperDashboard() {
     locations: ['United States', 'United Kingdom'],
     scrapeTypes: ['jobs', 'events'],
     maxPages: 50,
+    headless: false,
+    datePostedFilter: 'any',
     delayBetweenRequests: 2000,
     isRunning: false,
     progress: { jobs: 0, events: 0, people: 0, articles: 0 },
@@ -82,6 +87,16 @@ export default function ScraperDashboard() {
     totalArticles: 0
   })
 
+  const [verificationStatus, setVerificationStatus] = useState<{
+    required: boolean;
+    url: string | null;
+    instructions: string | null;
+  }>({
+    required: false,
+    url: null,
+    instructions: null
+  })
+
   useEffect(() => {
     // Load saved config from localStorage
     const savedConfig = localStorage.getItem('scraperConfig')
@@ -90,7 +105,7 @@ export default function ScraperDashboard() {
     }
 
     // Load stats
-    fetchStats()
+    //fetchStats()
   }, [])
 
   const fetchStats = async () => {
@@ -139,7 +154,13 @@ export default function ScraperDashboard() {
   const saveConfig = () => {
     const { isRunning: _, progress: __, ...configToSave } = config
     localStorage.setItem('scraperConfig', JSON.stringify(configToSave))
-    alert('Configuration saved!')
+    toast.success('Configuration saved!',{
+      style: {
+        background: '#07b92e',
+        color: '#fff',
+        fontSize: '14px',
+      }
+    })
   }
 
   const startScraper = async () => {
@@ -157,12 +178,24 @@ export default function ScraperDashboard() {
         const pollInterval = setInterval(async () => {
           const progressRes = await fetch('/api/scraper/progress')
           if (progressRes.ok) {
-            const progress = await progressRes.json()
-            setConfig(prev => ({ ...prev, progress }))
+            const data = await progressRes.json()
+            console.log('Scraper progress:', data)
+            setConfig(prev => ({ ...prev, progress: data.progress || {} }))
 
-            if (progress.completed) {
+            // Update verification status
+            if (data.verificationRequired !== undefined) {
+              setVerificationStatus({
+                required: data.verificationRequired,
+                url: data.verificationUrl,
+                instructions: data.verificationInstructions
+              })
+            }
+
+            if (data.progress?.completed) {
               clearInterval(pollInterval)
+              //await fetch('/api/scraper/stop')
               setConfig(prev => ({ ...prev, isRunning: false, lastRun: new Date().toISOString() }))
+              setVerificationStatus({ required: false, url: null, instructions: null })
               fetchStats()
             }
           }
@@ -177,6 +210,7 @@ export default function ScraperDashboard() {
   const stopScraper = async () => {
     await fetch('/api/scraper/stop', { method: 'POST' })
     setConfig(prev => ({ ...prev, isRunning: false }))
+    setVerificationStatus({ required: false, url: null, instructions: null })
   }
 
   return (
@@ -320,6 +354,35 @@ export default function ScraperDashboard() {
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="headless"
+                      checked={config.headless}
+                      onCheckedChange={(checked) => setConfig(prev => ({ ...prev, headless: !!checked }))}
+                    />
+                    <Label htmlFor="headless" className="text-sm">
+                      Run in headless mode (recommended for production)
+                    </Label>
+                  </div>
+                  <div>
+                    <Label htmlFor="dateFilter">Date Posted Filter</Label>
+                    <select
+                      id="dateFilter"
+                      value={config.datePostedFilter}
+                      onChange={(e) => setConfig(prev => ({ ...prev, datePostedFilter: e.target.value as any }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="any">Any time</option>
+                      <option value="past-24h">Past 24 hours</option>
+                      <option value="past-week">Past week</option>
+                      <option value="past-month">Past month</option>
+                      <option value="past-3months">Past 3 months</option>
+                      <option value="past-6months">Past 6 months</option>
+                      <option value="past-year">Past year</option>
+                    </select>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -357,6 +420,26 @@ export default function ScraperDashboard() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
                       Scraper is running. Progress updates every 5 seconds.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {verificationStatus.required && (
+                  <Alert className="border-yellow-500 bg-yellow-50">
+                    <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    <AlertDescription className="text-yellow-800">
+                      <strong>Device Verification Required</strong><br />
+                      {verificationStatus.instructions}<br />
+                      {verificationStatus.url && (
+                        <a
+                          href={verificationStatus.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-blue-600 hover:text-blue-800"
+                        >
+                          Open verification page
+                        </a>
+                      )}
                     </AlertDescription>
                   </Alert>
                 )}

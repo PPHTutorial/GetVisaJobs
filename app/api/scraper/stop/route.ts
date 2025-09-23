@@ -1,10 +1,14 @@
 // app/api/scraper/stop/route.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { scraperManager } from '../../../../lib/scraper/scraper-manager'
 
 export async function POST(_request: NextRequest) {
   try {
-    // Note: In a real implementation, you'd need to track the process globally
-    // For now, this is a placeholder
+    if (!scraperManager.isActive()) {
+      return NextResponse.json({ message: 'No scraper is currently running' })
+    }
+
+    await scraperManager.stop()
     return NextResponse.json({ message: 'Scraper stop requested' })
   } catch (error) {
     console.error('Error stopping scraper:', error)

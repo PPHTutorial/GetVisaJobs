@@ -6,11 +6,17 @@ export interface Job {
   location: string
   salaryMin?: number
   salaryMax?: number
+  description?: string
+  requirements?: string
+  benefits?: string
   salaryCurrency: string
   salaryType: string
   salaryMode: string
   isActive: boolean
   isFeatured: boolean
+  postedAt: string
+  applicationDeadline?: string
+  about?: string
   logo?: string
   viewCount: number
   employmentType?: string

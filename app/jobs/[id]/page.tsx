@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { MapPin, Clock, Building, Bookmark, Share2, ArrowLeft } from 'lucide-react'
+import { MapPin, Clock, Building, Bookmark, Share2, ArrowLeft, BriefcaseBusiness, Building2 } from 'lucide-react'
 import NavbarComponent from '@/components/ui/navbar'
 import Footer from '@/components/footer'
 import { formatSalary, getCompanyDisplayName, type Job } from '@/lib/homepage-data'
@@ -76,7 +77,7 @@ export default function JobDetailsPage() {
             <div className="text-gray-600">Loading job details...</div>
           </div>
         </div>
-        <Footer />
+
       </div>
     )
   }
@@ -104,44 +105,37 @@ export default function JobDetailsPage() {
       <NavbarComponent />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/jobs')}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Jobs
-        </Button>
 
         {/* Job Header */}
         <Card className="mb-6">
           <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xl">⚡</span>
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between">
+              <div className="flex flex-col lg:justify-between w-full mb-4 lg:mb-0">
+                <div className="flex items-start space-x-4">
+                  <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
+                    {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                      {job.title}
+                    </h1>
+                    <p className="text-orange-500 font-semibold text-lg mb-2">
+                      {getCompanyDisplayName(job)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    {job.title}
-                  </h1>
-                  <p className="text-orange-500 font-semibold text-lg mb-2">
-                    {getCompanyDisplayName(job)}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-4 text-gray-600">
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {job.location}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {job.salaryType || 'Full-time'}
-                    </div>
-                    <div className="flex items-center">
-                      <Building className="w-4 h-4 mr-1" />
-                      {job.category?.name || 'Not specified'}
-                    </div>
+                <div className="flex flex-wrap lg:flex-row items-center gap-2 text-gray-600">
+                  <div className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    {job.location}
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {job.salaryType || 'Full-time'}
+                  </div>
+                  <div className="flex items-center">
+                    <Building className="w-4 h-4 mr-1" />
+                    {job.category?.name || 'Not specified'}
                   </div>
                 </div>
               </div>
@@ -170,16 +164,7 @@ export default function JobDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed">
-                    This is a placeholder for the job description. In a real application,
-                    this would contain the full job description with requirements,
-                    responsibilities, and company information.
-                  </p>
-                  <p className="text-gray-700 leading-relaxed mt-4">
-                    We&apos;re looking for a talented professional to join our team and help
-                    us build amazing products. You&apos;ll work with cutting-edge technologies
-                    and collaborate with a diverse team of experts.
-                  </p>
+                  <span className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: job.description || 'No description provided.' }} />
                 </div>
               </CardContent>
             </Card>
@@ -190,13 +175,7 @@ export default function JobDetailsPage() {
                 <CardTitle>Requirements</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Bachelor&apos;s degree in relevant field</li>
-                  <li>3+ years of experience in the role</li>
-                  <li>Strong technical skills</li>
-                  <li>Excellent communication skills</li>
-                  <li>Ability to work in a team environment</li>
-                </ul>
+                <span className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: job.requirements || 'No requirements provided.' }} />
               </CardContent>
             </Card>
 
@@ -206,13 +185,7 @@ export default function JobDetailsPage() {
                 <CardTitle>Benefits</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Competitive salary and benefits package</li>
-                  <li>Visa sponsorship available</li>
-                  <li>Flexible working arrangements</li>
-                  <li>Professional development opportunities</li>
-                  <li>Great work-life balance</li>
-                </ul>
+                <span className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: job.benefits || 'No benefits provided.' }} />
               </CardContent>
             </Card>
           </div>
@@ -230,16 +203,16 @@ export default function JobDetailsPage() {
                     {formatSalary(job)}
                   </p>
                   <p className="text-sm text-gray-600">
-                    {job.salaryMode} • {job.salaryCurrency}
+                    {job.salaryMode} Salary • {job.salaryCurrency} per {job.salaryType}
                   </p>
                 </div>
 
-                <Separator />
+                <Separator className='border-input' />
 
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Job Type:</span>
-                    <Badge variant="secondary">{job.salaryType || 'Full-time'}</Badge>
+                    <Badge variant="secondary">{job.jobType || 'Full-time'}</Badge>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Category:</span>
@@ -257,7 +230,7 @@ export default function JobDetailsPage() {
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className='border-input' />
 
                 <Button
                   onClick={handleApply}
@@ -281,8 +254,8 @@ export default function JobDetailsPage() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-lg">⚡</span>
+                    <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
+                      {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <Building2 className="text-input w-8 h-8" />}
                     </div>
                     <div>
                       <h4 className="font-semibold">
@@ -295,11 +268,10 @@ export default function JobDetailsPage() {
                   </div>
 
                   <p className="text-sm text-gray-700">
-                    We&apos;re a leading technology company focused on innovation
-                    and creating amazing products for our customers worldwide.
+                    <span className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: job?.about || 'No about provided.' }} />
                   </p>
 
-                  <div className="pt-3 border-t">
+                  <div className="pt-3 border-t border-input">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Industry:</span>
                       <span>Technology</span>

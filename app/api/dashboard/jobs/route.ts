@@ -192,8 +192,8 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy,
-        skip,
-        take: limit,
+        /* skip,
+        take: limit, */
       }),
       prisma.job.count({ where }),
     ])
@@ -218,6 +218,7 @@ export async function GET(request: NextRequest) {
       createdAt: job.createdAt.toISOString(),
       employer: job.employer,
       category: job.category,
+      logo: job.logo,
     }))
 
     return NextResponse.json({

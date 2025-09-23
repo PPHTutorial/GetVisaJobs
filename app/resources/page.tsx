@@ -174,13 +174,29 @@ export default function ResourcesPage() {
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Discover articles, guides, and insights to help you succeed in your career journey
             </p>
+            <div className="flex w-full gap-4 mt-8 max-w-2xl justify-center mx-auto">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Title or content"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                />
+              </div>
+              <Button onClick={handleSearch} className="px-8">
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Search and Filters */}
-      <section className="py-8 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="hidden py-8 bg-white border-b">
+        <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm border border-input p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               {/* Search */}
@@ -206,7 +222,7 @@ export default function ResourcesPage() {
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    
+
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
@@ -224,7 +240,7 @@ export default function ResourcesPage() {
                     <SelectValue placeholder="All tags" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    
+
                     {allTags.map((tag) => (
                       <SelectItem key={tag} value={tag}>
                         {tag}

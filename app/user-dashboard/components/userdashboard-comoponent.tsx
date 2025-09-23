@@ -5,7 +5,7 @@ import NavbarComponent from '@/components/ui/navbar'
 
 const UserDashboardComponent = () => {
     return (
-        <NavbarComponent />
+        <NavbarComponent /> 
     )
 }
 

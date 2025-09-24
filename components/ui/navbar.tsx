@@ -17,6 +17,7 @@ const NavbarComponent = () => {
         { name: 'Jobs', href: '/jobs' },
         { name: 'Events', href: '/events' },
         { name: 'Resources', href: '/resources' },
+        //{ name: 'Pricing', href: '/pricing' },
         { name: 'FAQs', href: '/faqs' },
     ]
 
@@ -112,7 +113,7 @@ const NavbarComponent = () => {
                                         <DropdownMenuItem>
                                             <button
                                                 onClick={async () => {
-                                                    await fetch('/api/auth/signin', { method: 'DELETE', credentials: 'include' })
+                                                    await fetch('/api/signin', { method: 'DELETE', credentials: 'include' })
                                                     window.location.href = '/'
                                                 }}
                                                 className="flex items-center space-x-2 w-full text-left"
@@ -125,7 +126,7 @@ const NavbarComponent = () => {
                                 </DropdownMenu>
                             </div>
                         ) : (
-                            <Link href="/auth/signin">
+                            <Link href="/signin">
                                 <Button variant="default" size="sm" className="bg-primary hover:bg-emerald-700 text-white">
                                     Sign In
                                 </Button>
@@ -195,7 +196,7 @@ const NavbarComponent = () => {
                                         </Link>
                                         <button
                                             onClick={async () => {
-                                                await fetch('/api/auth/signin', { method: 'DELETE', credentials: 'include' })
+                                                await fetch('/api/signin', { method: 'DELETE', credentials: 'include' })
                                                 window.location.href = '/'
                                                 setIsMobileMenuOpen(false)
                                             }}
@@ -206,7 +207,7 @@ const NavbarComponent = () => {
                                     </>
                                 ) : (
                                     <Link
-                                        href="/auth/signin"
+                                        href="/signin"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="block px-4 py-3 text-lg font-extrabold rounded-md transition-colors bg-primary text-white hover:bg-emerald-700"
                                     >

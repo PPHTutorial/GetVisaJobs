@@ -147,7 +147,7 @@ export default function FilesPage() {
     {
       key: 'filename',
       header: 'File',
-      render: (file) => (
+      render: (_, file) => (
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
             {file.fileType === 'IMAGE' && <ImageIcon className="h-8 w-8 text-blue-500" />}
@@ -164,7 +164,7 @@ export default function FilesPage() {
     {
       key: 'fileType',
       header: 'Type',
-      render: (file) => (
+      render: (_, file) => (
         <Badge variant="secondary">
           {file.fileType}
         </Badge>
@@ -173,7 +173,7 @@ export default function FilesPage() {
     {
       key: 'size',
       header: 'Size',
-      render: (file) => (
+      render: (_, file) => (
         <div className="text-sm">
           {formatFileSize(file.size)}
         </div>
@@ -182,7 +182,7 @@ export default function FilesPage() {
     {
       key: 'uploader',
       header: 'Uploaded By',
-      render: (file) => (
+      render: (_, file) => (
         <div className="text-sm">
           <div className="font-medium">
             {file.uploader.firstName} {file.uploader.lastName}
@@ -196,7 +196,7 @@ export default function FilesPage() {
     {
       key: 'createdAt',
       header: 'Upload Date',
-      render: (file) => (
+      render: (_, file) => (
         <div className="text-sm">
           {new Date(file.createdAt).toLocaleDateString()}
         </div>
@@ -205,7 +205,7 @@ export default function FilesPage() {
     {
       key: 'isPublic',
       header: 'Visibility',
-      render: (file) => (
+      render: (_, file) => (
         <Badge variant={file.isPublic ? "default" : "secondary"}>
           {file.isPublic ? "Public" : "Private"}
         </Badge>

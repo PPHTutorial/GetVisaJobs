@@ -68,7 +68,7 @@ export default function AdminActionsPage() {
     {
       key: 'action',
       header: 'Action',
-      render: (adminAction) => (
+      render: (_, adminAction) => (
         <div className="flex items-center space-x-3">
           {getActionIcon(adminAction.action)}
           <span className="font-medium capitalize">
@@ -80,7 +80,7 @@ export default function AdminActionsPage() {
     {
       key: 'admin',
       header: 'Admin',
-      render: (adminAction) => (
+      render: (_, adminAction) => (
         <div className="flex items-center space-x-3">
           <User className="h-4 w-4 text-muted-foreground" />
           <div>
@@ -97,10 +97,12 @@ export default function AdminActionsPage() {
     {
       key: 'details',
       header: 'Details',
-      render: (adminAction) => (
+      render: (_, adminAction) => (
         <div className="max-w-xs">
           <div className="text-sm">
-            {adminAction.details || 'No details available'}
+            <p>{adminAction.details?.newStatus || 'No details available'}</p>
+            <p>{adminAction.details?.previousStatus || 'No details available'}</p>
+            <p>{adminAction.details?.reason || 'No details available'}</p>
           </div>
           {adminAction.targetType && adminAction.targetId && (
             <div className="text-xs text-muted-foreground mt-1">
@@ -113,7 +115,7 @@ export default function AdminActionsPage() {
     {
       key: 'createdAt',
       header: 'Timestamp',
-      render: (adminAction) => (
+      render: (_, adminAction) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm">

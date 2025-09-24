@@ -11,7 +11,8 @@ import { UserApplications } from './components/user-applications'
 import { UserProfile } from './components/user-profile'
 import { SavedJobs } from './components/saved-jobs'
 import { ApplicationStats } from './components/application-stats'
-import { FileText, Heart, User, TrendingUp } from 'lucide-react'
+import { SubscriptionManagement } from './components/subscription-management'
+import { FileText, Heart, User, TrendingUp, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import UserDashboardComponent from './components/userdashboard-comoponent'
 import Footer from '@/components/footer'
@@ -66,7 +67,7 @@ export default async function UserDashboardPage() {
 
         {/* Main Content */}
         <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="applications" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Applications
@@ -74,6 +75,10 @@ export default async function UserDashboardPage() {
             <TabsTrigger value="saved" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Saved Jobs
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Subscription
             </TabsTrigger>
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -113,6 +118,20 @@ export default async function UserDashboardPage() {
                 <Suspense fallback={<div>Loading saved jobs...</div>}>
                   <SavedJobs />
                 </Suspense>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscription" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Management</CardTitle>
+                <CardDescription>
+                  Manage your subscription plan and billing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SubscriptionManagement />
               </CardContent>
             </Card>
           </TabsContent>

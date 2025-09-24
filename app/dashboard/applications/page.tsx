@@ -168,7 +168,7 @@ const columns: Column<Application>[] = [
   {
     key: 'user',
     header: 'Applicant',
-    render: (application) => (
+    render: (_, application) => (
       <div className="flex items-center">
         <User className="h-4 w-4 mr-2 text-muted-foreground" />
         <div>
@@ -182,7 +182,7 @@ const columns: Column<Application>[] = [
   {
     key: 'job',
     header: 'Job Position',
-    render: (application) => (
+    render: (_, application) => (
       <div className="flex items-center">
         <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" />
         <div>
@@ -196,10 +196,10 @@ const columns: Column<Application>[] = [
   {
     key: 'appliedAt',
     header: 'Applied Date',
-    render: (application) => (
+    render: (_, application) => (
       <div className="flex items-center">
         <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-        {application.appliedAt.toLocaleDateString()}
+        {new Date(application.appliedAt).toLocaleDateString()}
       </div>
     ),
     sortable: true,
@@ -207,7 +207,7 @@ const columns: Column<Application>[] = [
   {
     key: 'status',
     header: 'Status',
-    render: (application) => (
+    render: (_, application) => (
       <Badge
         variant={
           application.status === 'ACCEPTED' ? 'default' :

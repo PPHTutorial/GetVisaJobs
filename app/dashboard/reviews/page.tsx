@@ -99,7 +99,7 @@ export default function ReviewsPage() {
     {
       key: 'user',
       header: 'Reviewer',
-      render: (review) => (
+      render:  (_, review) => (
         <div className="flex items-center space-x-3">
           <User className="h-4 w-4 text-muted-foreground" />
           <div>
@@ -116,7 +116,7 @@ export default function ReviewsPage() {
     {
       key: 'job',
       header: 'Job',
-      render: (review) => (
+      render:  (_, review) => (
         <div className="flex items-center space-x-3">
           <Briefcase className="h-4 w-4 text-muted-foreground" />
           <div>
@@ -135,12 +135,12 @@ export default function ReviewsPage() {
     {
       key: 'rating',
       header: 'Rating',
-      render: (review) => renderStars(review.rating),
+      render:  (_, review) => renderStars(review.rating),
     },
     {
       key: 'title',
       header: 'Review',
-      render: (review) => (
+      render:  (_, review) => (
         <div className="max-w-xs">
           <div className="font-medium text-sm">{review.title}</div>
           <div className="text-sm text-muted-foreground truncate">
@@ -152,7 +152,7 @@ export default function ReviewsPage() {
     {
       key: 'isVerified',
       header: 'Status',
-      render: (review) => (
+      render:  (_, review) => (
         review.isVerified ? (
           <Badge className="bg-green-100 text-green-800">Verified</Badge>
         ) : (
@@ -163,7 +163,7 @@ export default function ReviewsPage() {
     {
       key: 'createdAt',
       header: 'Date',
-      render: (review) => (
+      render:  (_, review) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span>{new Date(review.createdAt).toLocaleDateString()}</span>

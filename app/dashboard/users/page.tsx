@@ -4,6 +4,7 @@ import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
 import { UsersTable } from './components/users-table'
 import { Plus, Users as UsersIcon } from 'lucide-react'
+import { StatsCards } from './components/stats-cards'
 
 export default function UsersPage() {
   return (
@@ -27,59 +28,24 @@ export default function UsersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <UsersIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,543</div>
-            <p className="text-xs text-muted-foreground">
-              +12.5% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <UsersIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,892</div>
-            <p className="text-xs text-muted-foreground">
-              74.3% of total users
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Admins</CardTitle>
-            <UsersIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">
-              Platform administrators
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Employers</CardTitle>
-            <UsersIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">
-              Verified employers
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Suspense fallback={
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Loading...</CardTitle>
+                <UsersIcon className="h-4 w-4 text-muted-foreground animate-pulse" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-16 rounded"></div>
+                <p className="text-xs text-muted-foreground animate-pulse bg-gray-200 dark:bg-gray-700 h-4 w-24 rounded mt-1"></p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      }>
+        <StatsCards />
+      </Suspense>
 
       {/* Users Table */}
       <Card>

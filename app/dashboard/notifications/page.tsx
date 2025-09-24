@@ -106,7 +106,7 @@ export default function NotificationsPage() {
     {
       key: 'user',
       header: 'Recipient',
-      render: (notification) => (
+      render: (_, notification) => (
         <div className="flex items-center space-x-3">
           <User className="h-4 w-4 text-muted-foreground" />
           <div>
@@ -123,7 +123,7 @@ export default function NotificationsPage() {
     {
       key: 'title',
       header: 'Title',
-      render: (notification) => (
+      render: (_, notification) => (
         <div className="max-w-xs">
           <div className="font-medium">{notification.title}</div>
           <div className="text-sm text-muted-foreground truncate">
@@ -135,12 +135,12 @@ export default function NotificationsPage() {
     {
       key: 'type',
       header: 'Type',
-      render: (notification) => getTypeBadge(notification.type),
+      render: (_, notification) => getTypeBadge(notification.type),
     },
     {
       key: 'isRead',
       header: 'Status',
-      render: (notification) => (
+      render: (_, notification) => (
         notification.isRead ? (
           <Badge className="bg-green-100 text-green-800">Read</Badge>
         ) : (
@@ -151,7 +151,7 @@ export default function NotificationsPage() {
     {
       key: 'createdAt',
       header: 'Sent Date',
-      render: (notification) => (
+      render: (_, notification) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span>{new Date(notification.createdAt).toLocaleDateString()}</span>

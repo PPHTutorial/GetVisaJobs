@@ -81,6 +81,20 @@ enum ApplicationMethod {
   INTERNAL
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum SubscriptionPlanType {
+  BASIC
+  PROFESSIONAL
+  PREMIUM
+}
+
 // User Management
 model User {
   id                String    @id @default(cuid())
@@ -105,6 +119,7 @@ model User {
   graduationYear    Int?
   skills            String[] // Array of skills
   isActive          Boolean   @default(true)
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
   lastLoginAt       DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -121,6 +136,7 @@ model User {
   authoredBlogs      Blog[]
   uploadedFiles      File[]
   refreshTokens      RefreshToken[]
+  subscription       UserSubscription?
 
   @@map("users")
 }
@@ -379,6 +395,48 @@ model Payment {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+// Subscription System
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  type        SubscriptionPlanType @unique
+  description String
+  price       Float   // Monthly price in USD
+  currency    String  @default("USD")
+  features    Json    // Array of feature descriptions
+  maxApplications Int @default(10) // Max job applications per month
+  isPopular   Boolean @default(false)
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  subscriptions UserSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model UserSubscription {
+  id            String             @id @default(cuid())
+  userId        String
+  planId        String
+  status        SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean       @default(false)
+  applicationsUsed   Int           @default(0) // Applications used this month
+  stripeSubscriptionId String?     // For Stripe integration
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@unique([userId]) // One active subscription per user
+  @@map("user_subscriptions")
 }
 
 // File Management

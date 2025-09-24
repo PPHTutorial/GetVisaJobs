@@ -101,7 +101,7 @@ export default function PaymentsPage() {
     {
       key: 'user',
       header: 'User',
-      render: (payment) => (
+      render: (_, payment) => (
         <div className="flex items-center space-x-3">
           <User className="h-4 w-4 text-muted-foreground" />
           <div>
@@ -118,7 +118,7 @@ export default function PaymentsPage() {
     {
       key: 'amount',
       header: 'Amount',
-      render: (payment) => (
+      render: (_, payment) => (
         <div className="font-medium">
           {formatCurrency(payment.amount, payment.currency)}
         </div>
@@ -127,7 +127,7 @@ export default function PaymentsPage() {
     {
       key: 'paymentMethod',
       header: 'Method',
-      render: (payment) => (
+      render: (_, payment) => (
         <div className="flex items-center space-x-2">
           <CreditCard className="h-4 w-4 text-muted-foreground" />
           <span>{payment.paymentMethod || 'N/A'}</span>
@@ -137,12 +137,12 @@ export default function PaymentsPage() {
     {
       key: 'status',
       header: 'Status',
-      render: (payment) => getStatusBadge(payment.status),
+      render: (_, payment) => getStatusBadge(payment.status),
     },
     {
       key: 'transactionId',
       header: 'Transaction ID',
-      render: (payment) => (
+      render: (_, payment) => (
         <div className="font-mono text-sm">
           {payment.transactionId || 'N/A'}
         </div>
@@ -151,7 +151,7 @@ export default function PaymentsPage() {
     {
       key: 'createdAt',
       header: 'Date',
-      render: (payment) => (
+      render: (_, payment) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span>{new Date(payment.createdAt).toLocaleDateString()}</span>

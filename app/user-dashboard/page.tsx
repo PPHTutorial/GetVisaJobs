@@ -39,7 +39,11 @@ export default async function UserDashboardPage() {
       <div className="max-w-7xl space-y-6 mx-auto mt-2 lg:mt-8 p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">My Dashboard</h1><span>
+              <Badge variant="outline" className="capitalize">
+                {user.role?.toLowerCase()}
+              </Badge>
+            </span>
             <p className="text-muted-foreground">
               Track your job applications and manage your profile
             </p>
@@ -166,7 +170,7 @@ export default async function UserDashboardPage() {
           </TabsContent>
         </Tabs>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   )
 }

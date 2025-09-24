@@ -128,7 +128,6 @@ export default function EventDetailsPage() {
             })
             return `${startTime} - ${endTime}`
         }
-
         return startTime
     }
 

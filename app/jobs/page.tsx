@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Bookmark, GraduationCap, Search, X, SlidersHorizontal, BriefcaseBusiness } from 'lucide-react'
+import { MapPin, Bookmark, GraduationCap, Search, X, SlidersHorizontal, BriefcaseBusiness, Star } from 'lucide-react'
 import NavbarComponent from '@/components/ui/navbar'
 import Footer from '@/components/footer'
 import { formatSalary, getCompanyDisplayName, type Job } from '@/lib/homepage-data'
@@ -518,7 +518,7 @@ function JobsPageContent() {
                             <div className="flex  gap-4 items-end">
                                 {/* Search Input */}
                                 <div className="flex-1">
-                                    <Label htmlFor="search" className="sticky hidden lg:block text-sm font-medium">Job Title or Keywords</Label>
+                                    {/* <Label htmlFor="search" className="sticky hidden lg:block text-sm font-medium">Job Title or Keywords</Label> */}
                                     <div className="relative">
                                         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                         <Input
@@ -670,16 +670,18 @@ function JobsPageContent() {
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
-                                                                    <h3 className="text-xl font-bold text-gray-900 mb-1">
-                                                                        {job.title}
-                                                                    </h3>
+                                                                    <div className="flex gap-2 items-center">
+                                                                        <h3 className="text-xl font-bold text-gray-900 mb-1">
+                                                                            {job.title}
+                                                                        </h3>
+                                                                        {job.isFeatured && (
+                                                                            <Star className="w-5 h-5 text-orange-500 ml-4" />
+                                                                        )}
+                                                                    </div>
                                                                     <p className="text-orange-500 font-semibold mb-2">
                                                                         {getCompanyDisplayName(job)}
                                                                     </p>
                                                                 </div>
-                                                                {job.isFeatured && (
-                                                                    <Badge className="bg-orange-500 text-white ml-4">Featured</Badge>
-                                                                )}
                                                             </div>
                                                             <div className="flex flex-wrap items-center gap-4 text-gray-600 text-sm">
                                                                 <div className="flex items-center">
@@ -697,7 +699,7 @@ function JobsPageContent() {
                                                                     {job.employmentType || 'Full-time'}
                                                                 </Badge>
                                                                 {job.jobType && (
-                                                                    <Badge variant="outline" className="text-xs">
+                                                                    <Badge variant="outline" className="text-xs border-input">
                                                                         {job.jobType.replace('_', ' ')}
                                                                     </Badge>
                                                                 )}
@@ -705,7 +707,7 @@ function JobsPageContent() {
                                                         </div>
                                                     </div>
                                                     <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()} className="ml-4">
-                                                        <Bookmark className="w-5 h-5 text-neutral-500" />
+                                                        <Bookmark className="w-5 h-5 text-orange-500" />
                                                     </Button>
                                                 </div>
                                             </CardContent>

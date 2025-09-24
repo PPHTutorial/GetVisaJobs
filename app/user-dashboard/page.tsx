@@ -39,19 +39,17 @@ export default async function UserDashboardPage() {
       <div className="max-w-7xl space-y-6 mx-auto mt-2 lg:mt-8 p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Dashboard</h1><span>
-              <Badge variant="outline" className="capitalize">
+            <div className='flex items-center gap-4'>
+              <h1 className="text-3xl font-bold tracking-tight">My Dashboard</h1>
+              <Badge variant="outline" className="capitalize ">
                 {user.role?.toLowerCase()}
               </Badge>
-            </span>
+            </div>
             <p className="text-muted-foreground">
               Track your job applications and manage your profile
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="capitalize">
-              {user.role?.toLowerCase()}
-            </Badge>
             <Button asChild>
               <Link href="/jobs" className='flex items-center'>
                 <FileText className="mr-2 h-4 w-4" />

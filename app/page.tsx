@@ -163,8 +163,8 @@ export default function Home() {
                 </h1>
               </div>
 
-              <p className="text-base md:text-2xl lg:text-xl text-center lg:text-right text-gray-600 leading-snug lg:leading-relaxed">
-                Apply for remote, student, graduate, experienced, internship,.. <br />
+              <p className="text-base md:text-2xl lg:text-lg text-center lg:text-left text-gray-600 leading-snug lg:leading-relaxed">
+                Apply for remote, student, graduate, experienced, internship and many more roles.
                 Get hired with Visa sponsored and high paid jobs across the globe.
               </p>
 
@@ -238,61 +238,7 @@ export default function Home() {
           <div className="space-y-4">
             {data?.featuredJobs.slice(0, 2).map((job) => (
               <Card key={job.id} className="hover:shadow-sm transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
-                        {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-extrabold text-gray-900">
-                          {job.title}
-                        </h3>
-                        <p className="text-orange-500 font-semibold">{getCompanyDisplayName(job)}</p>
-                        <div className="flex items-center space-x-4 text-gray-600">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {job.location}
-                          </div>
-                          <div className="flex items-center">
-                            <GraduationCap className="w-4 h-4 mr-1" />
-                            Bachelor&apos;s
-                          </div>
-                          <div className="flex items-center">
-                            <span>{formatSalary(job)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Bookmark className="w-6 h-6 text-neutral-500" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
-              Load More
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Jobs - Experienced */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-primary font-medium mb-2">FEATURED JOBS</p>
-            <h2 className="text-4xl font-bold text-gray-900">Top experienced hire jobs</h2>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {data?.highSalaryJobs.slice(0, 4).map((job) => (
-              <div key={job.id} className="space-y-4">
-                <Card className="hover:shadow-sm transition-shadow">
+                <Link href={`/jobs/${job.id}`} className="no-underline">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
@@ -324,7 +270,65 @@ export default function Home() {
                       </Button>
                     </div>
                   </CardContent>
-                </Card>
+                </Link>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
+              Load More
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Jobs - Experienced */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-primary font-medium mb-2">FEATURED JOBS</p>
+            <h2 className="text-4xl font-bold text-gray-900">Top experienced hire jobs</h2>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {data?.highSalaryJobs.slice(0, 4).map((job) => (
+              <div key={job.id} className="space-y-4">
+                <Link href={`/jobs/${job.id}`} className="no-underline">
+                  <Card className="hover:shadow-sm transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
+                            {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-extrabold text-gray-900">
+                              {job.title}
+                            </h3>
+                            <p className="text-orange-500 font-semibold">{getCompanyDisplayName(job)}</p>
+                            <div className="flex items-center space-x-4 text-gray-600">
+                              <div className="flex items-center">
+                                <MapPin className="w-4 h-4 mr-1" />
+                                {job.location}
+                              </div>
+                              <div className="flex items-center">
+                                <GraduationCap className="w-4 h-4 mr-1" />
+                                Bachelor&apos;s
+                              </div>
+                              <div className="flex items-center">
+                                <span>{formatSalary(job)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <Bookmark className="w-6 h-6 text-neutral-500" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </div>
             ))}
           </div>
@@ -348,50 +352,52 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {data?.upcomingEvents.map((event) => (
               <Card key={event.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-primary text-white rounded-lg p-3 text-center min-w-[80px]">
-                      <div className="text-xs font-medium">
-                        {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                <Link href={`/jobs/${event.id}`} className="no-underline">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-primary text-white rounded-lg p-3 text-center min-w-[80px]">
+                        <div className="text-xs font-medium">
+                          {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                        </div>
+                        <div className="text-2xl font-bold">
+                          {new Date(event.startDate).getDate()}
+                        </div>
                       </div>
-                      <div className="text-2xl font-bold">
-                        {new Date(event.startDate).getDate()}
+                      <div className="flex-1">
+                        <h3 className="text-xl font-extrabold text-gray-900">
+                          {event.title}
+                        </h3>
+                        <div className=" text-gray-600 mb-2">
+                          <div className="flex items-center">
+                            <span className="font-semibold">
+                              {event.isVirtual ? 'Virtual Event' : (event.location || 'Location TBA')}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <span>
+                              {new Date(event.startDate).toLocaleDateString('en-US', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })} @ {new Date(event.startDate).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-extrabold text-gray-900">
-                        {event.title}
-                      </h3>
-                      <div className=" text-gray-600 mb-2">
-                        <div className="flex items-center">
-                          <span className="font-semibold">
-                            {event.isVirtual ? 'Virtual Event' : (event.location || 'Location TBA')}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <span>
-                            {new Date(event.startDate).toLocaleDateString('en-US', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })} @ {new Date(event.startDate).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                      </div>
+                      <p className="text-gray-600 text-sm mb-4">
+                        {event.description?.substring(0, 150)}...
+                      </p>
+                      <Button className="bg-primary hover:bg-emerald-700 text-white">
+                        Register Now
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-gray-600 text-sm mb-4">
-                      {event.description?.substring(0, 150)}...
-                    </p>
-                    <Button className="bg-primary hover:bg-emerald-700 text-white">
-                      Register Now
-                    </Button>
-                  </div>
-                </CardContent>
+                  </CardContent>
+                </Link>
               </Card>
             ))}
           </div>
@@ -415,33 +421,35 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {data?.latestBlogs.map((blog) => (
               <Card key={blog.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                <div className="aspect-video bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
-                  {blog.imageUrl ? (
-                    <img
-                      src={blog.imageUrl}
-                      alt={blog.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-16 h-12 bg-red-600 rounded mx-auto mb-2 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">UK VISA</span>
+                <Link href={`/jobs/${blog.id}`} className="no-underline">
+                  <div className="aspect-video bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
+                    {blog.imageUrl ? (
+                      <img
+                        src={blog.imageUrl}
+                        alt={blog.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <div className="w-16 h-12 bg-red-600 rounded mx-auto mb-2 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">UK VISA</span>
+                        </div>
+                        <div className="text-red-800 font-medium">ARTICLE</div>
                       </div>
-                      <div className="text-red-800 font-medium">ARTICLE</div>
-                    </div>
-                  )}
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    {blog.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {blog.excerpt?.substring(0, 120)}...
-                  </p>
-                  <Button variant="ghost" className="text-primary hover:text-emerald-700 p-0">
-                    Read More →
-                  </Button>
-                </CardContent>
+                    )}
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      {blog.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {blog.excerpt?.substring(0, 120)}...
+                    </p>
+                    <Button variant="ghost" className="text-primary hover:text-emerald-700 p-0">
+                      Read More →
+                    </Button>
+                  </CardContent>
+                </Link>
               </Card>
             ))}
           </div>

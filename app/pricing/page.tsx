@@ -36,13 +36,13 @@ export default function PricingPage() {
             price: 2.99,
             currency: 'USD',
             features: [
-                'Up to 10 job applications per month',
+                'Up to 50 job applications per month',
                 'Basic job search and filtering',
                 'Email notifications for new jobs',
                 'Access to job application tracking',
                 'Resume upload and storage'
             ],
-            maxApplications: 10,
+            maxApplications: 50,
             isPopular: false,
         },
         {
@@ -53,7 +53,7 @@ export default function PricingPage() {
             price: 9.99,
             currency: 'USD',
             features: [
-                'Up to 50 job applications per month',
+                'Up to 500 job applications per month',
                 'Advanced job search with AI matching',
                 'Priority customer support',
                 'Resume review and optimization tips',
@@ -62,7 +62,7 @@ export default function PricingPage() {
                 'Direct messaging with employers',
                 'Application analytics and insights'
             ],
-            maxApplications: 50,
+            maxApplications: 500,
             isPopular: true,
         },
         {

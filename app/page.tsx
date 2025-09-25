@@ -193,7 +193,7 @@ export default function Home() {
                   </Button>
                 </Link>
 
-                <Link href="/subscription" >
+                <Link href="/pricing" >
                   <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50 px-8 py-3 text-lg">
                     Subscribe
                   </Button>

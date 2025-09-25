@@ -11,7 +11,11 @@ interface AdminActionItem {
   id: string
   adminId: string
   action: string
-  details?: string
+  details?: {
+    newStatus: string
+    previousStatus: string
+    reason: string
+  }
   targetType?: string
   targetId?: string
   createdAt: string

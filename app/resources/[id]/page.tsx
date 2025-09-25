@@ -248,7 +248,7 @@ export default function BlogDetailsPage() {
                     </div>
                     <div>
                       <p className="font-semibold">{getAuthorName(blog)}</p>
-                      <p className="text-sm text-gray-600">{blog.author.email}</p>
+                      <p className="text-sm text-gray-600 break-all">{blog.author.email}</p>
                     </div>
                   </div>
                 </CardContent>

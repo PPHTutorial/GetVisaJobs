@@ -53,14 +53,14 @@ export default function PricingPage() {
             price: 9.99,
             currency: 'USD',
             features: [
-                'Up to 500 job applications per month',
-                'Advanced job search with AI matching',
-                'Priority customer support',
-                'Resume review and optimization tips',
-                'Application deadline reminders',
-                'Interview preparation resources',
-                'Direct messaging with employers',
-                'Application analytics and insights'
+                "Up to 500 job applications per month",
+                "Advanced job search with AI matching",
+                "Priority customer support",
+                "Resume review and optimization tips",
+                "Application deadline reminders",
+                "Interview preparation resources",
+                "Direct messaging with employers",
+                "Application analytics and insights"
             ],
             maxApplications: 500,
             isPopular: true,
@@ -73,16 +73,16 @@ export default function PricingPage() {
             price: 14.99,
             currency: 'USD',
             features: [
-                'Unlimited job applications',
-                'AI-powered job matching',
-                '24/7 premium support',
-                'Professional resume writing service',
-                'LinkedIn profile optimization',
-                'Mock interview sessions',
-                'Career coaching sessions',
-                'Exclusive access to premium jobs',
-                'Salary negotiation assistance',
-                'Company insights and reviews'
+                "Unlimited job applications",
+                "AI-powered job matching",
+                "24/7 premium support",
+                "Professional resume writing service",
+                "LinkedIn profile optimization",
+                "Mock interview sessions",
+                "Career coaching sessions",
+                "Exclusive access to premium jobs",
+                "Salary negotiation assistance",
+                "Company insights and reviews"
             ],
             maxApplications: -1,
             isPopular: false,
@@ -98,7 +98,8 @@ export default function PricingPage() {
             const response = await fetch('/api/subscriptions/plans')
             if (response.ok) {
                 const data = await response.json()
-                if (data.length > 0) {
+                if (data.plans.length > 0) {
+                    console.log('Fetched plans from API:', data.plans)
                     setPlans(data.plans)
                 } else {
                     setPlans(pricing)

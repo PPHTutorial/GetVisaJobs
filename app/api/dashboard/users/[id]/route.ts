@@ -1,7 +1,6 @@
+import { getAuthUser } from '@/lib/auth'
+import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../../../../../lib/auth'
-import prisma from '../../../../../lib/prisma'
 import { z } from 'zod'
 
 // Validation schema for user update
@@ -35,14 +34,13 @@ interface RouteParams {
 // GET /api/dashboard/users/[id] - Get a specific user
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions)
+    const currentUser = await getAuthUser()
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!currentUser) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user has admin or employer role
-    const userRole = (session.user as any).role
+    const userRole = (currentUser as any).role
     if (userRole !== 'ADMIN' && userRole !== 'EMPLOYER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -104,14 +102,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PUT /api/dashboard/users/[id] - Update a specific user
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions)
+    const user = await getAuthUser()
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user has admin role
-    const userRole = (session.user as any).role
+    const userRole = (user as any).role
     if (userRole !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -200,14 +197,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/dashboard/users/[id] - Delete a specific user
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions)
+    const user = await getAuthUser()
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user has admin role
-    const userRole = (session.user as any).role
+    const userRole = (user as any).role
     if (userRole !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

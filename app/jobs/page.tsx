@@ -25,6 +25,9 @@ function JobsPageContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
+    // Constants
+    const PAGE_SIZE = 15
+
     // State management
     const [jobs, setJobs] = useState<Job[]>([])
     const [categories, setCategories] = useState<Category[]>([])
@@ -32,6 +35,7 @@ function JobsPageContent() {
     const [totalJobs, setTotalJobs] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set())
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
@@ -83,7 +87,7 @@ function JobsPageContent() {
         try {
             const params = new URLSearchParams({
                 page: currentPage.toString(),
-                limit: '12',
+                limit: PAGE_SIZE.toString(),
                 status: 'active'
             })
 
@@ -108,9 +112,12 @@ function JobsPageContent() {
             const response = await fetch(`/api/dashboard/jobs?${params}`)
             if (response.ok) {
                 const data = await response.json()
+                const total = data.pagination?.total || 0
                 setJobs(data.jobs || [])
-                setTotalJobs(data.pagination?.total || 0)
-                setTotalPages(data.pagination?.pages || 1)
+                setTotalJobs(total)
+                // Calculate total pages even if backend doesn't provide it
+                const calculatedPages = Math.ceil(total / PAGE_SIZE)
+                setTotalPages(data.pagination?.pages || calculatedPages || 1)
             }
         } catch (error) {
             console.error('Failed to fetch jobs:', error)
@@ -131,14 +138,67 @@ function JobsPageContent() {
         }
     }, [])
 
+    const fetchSavedJobs = useCallback(async () => {
+        try {
+            const response = await fetch('/api/user/saved-jobs')
+            if (response.ok) {
+                const data = await response.json()
+                // Create a Set of saved job IDs for efficient lookup
+                setSavedJobIds(new Set(data.savedJobs.map((job: Job) => job.id)))
+            }
+        } catch (error) {
+            console.error('Failed to fetch saved jobs:', error)
+        }
+    }, [])
+
+    const handleSave = async (jobId: string) => {
+        const isSaved = savedJobIds.has(jobId)
+        try {
+            const method = isSaved ? 'DELETE' : 'POST'
+            const response = await fetch(`/api/user/saved-jobs`, {
+                method,
+                body: JSON.stringify({ jobId }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (response.ok) {
+                // Update the Set of saved job IDs
+                const newSavedJobIds = new Set(savedJobIds)
+                if (isSaved) {
+                    newSavedJobIds.delete(jobId)
+                } else {
+                    newSavedJobIds.add(jobId)
+                }
+                setSavedJobIds(newSavedJobIds)
+            } else {
+                const data = await response.json()
+                alert(data.error || 'Failed to save job')
+            }
+        } catch (error) {
+            console.error('Error saving job:', error)
+            alert('Failed to save job')
+        }
+    }
+
     // Effects
     useEffect(() => {
+        // Set initial page from URL on component mount
+        const pageFromUrl = searchParams.get('page')
+        if (pageFromUrl) {
+            const page = Number(pageFromUrl)
+            if (!isNaN(page) && page > 0) {
+                setCurrentPage(page)
+            }
+        }
         fetchCategories()
-    }, [fetchCategories])
+    }, [fetchCategories, searchParams])
 
     useEffect(() => {
         fetchJobs()
-    }, [fetchJobs])
+        fetchSavedJobs()
+    }, [fetchJobs, fetchSavedJobs, currentPage])
 
     // Update URL when filters change
     useEffect(() => {
@@ -635,7 +695,7 @@ function JobsPageContent() {
                             {/* Results Summary */}
                             <div className="mb-6">
                                 <p className="text-gray-600">
-                                    Showing {jobs.length} of {totalJobs} jobs
+                                    Showing {currentPage} of {totalJobs} jobs
                                     {activeFiltersCount > 0 && ` (${activeFiltersCount} filter${activeFiltersCount > 1 ? 's' : ''} applied)`}
                                 </p>
                             </div>
@@ -655,7 +715,7 @@ function JobsPageContent() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {jobs.map((job) => (
+                                    {jobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((job) => (
                                         <Card
                                             key={job.id}
                                             className="hover:shadow-md transition-shadow cursor-pointer"
@@ -665,7 +725,7 @@ function JobsPageContent() {
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex items-start space-x-4 flex-1">
                                                         <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
-                                                            {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
+                                                            {job.logo ? <img src={job.logo} className='rounded-lg w-size-14' alt={job.title} /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-start justify-between">
@@ -706,8 +766,8 @@ function JobsPageContent() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()} className="ml-4">
-                                                        <Bookmark className="w-5 h-5 text-orange-500" />
+                                                    <Button variant="ghost" size="sm" onClick={() => handleSave(job.id)} className="ml-4">
+                                                        <Bookmark className={`w-5 h-5 ${savedJobIds.has(job.id) ? 'text-orange-500' : 'text-gray-400'}`} />
                                                     </Button>
                                                 </div>
                                             </CardContent>
@@ -715,37 +775,89 @@ function JobsPageContent() {
                                     ))}
                                 </div>
                             )}
-
-                            {/* Pagination */}
+                            {/* Jobs count and Pagination */}
+                            <div className="mt-8 text-center text-sm text-gray-600 mb-4">
+                                Showing {currentPage} of {totalJobs} jobs
+                            </div>
                             {totalPages > 1 && (
-                                <div className="flex justify-center items-center gap-2 mt-8">
+                                <div className="flex justify-center items-center gap-2">
                                     <Button
                                         variant="outline"
-                                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                        onClick={() => {
+                                            const newPage = Math.max(1, currentPage - 1);
+                                            setCurrentPage(newPage);
+                                            router.push(`/jobs?page=${newPage}`, { scroll: false });
+                                        }}
                                         disabled={currentPage === 1}
                                     >
                                         Previous
                                     </Button>
 
                                     <div className="flex gap-1">
-                                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                            const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
-                                            return (
-                                                <Button
-                                                    key={pageNum}
-                                                    variant={pageNum === currentPage ? "default" : "outline"}
-                                                    onClick={() => setCurrentPage(pageNum)}
-                                                    className="w-10"
-                                                >
-                                                    {pageNum}
-                                                </Button>
-                                            )
-                                        })}
+                                        {(() => {
+                                            const pages = [];
+                                            if (totalPages <= 7) {
+                                                // Show all pages if total is 7 or less
+                                                for (let i = 1; i <= totalPages; i++) {
+                                                    pages.push(i);
+                                                }
+                                            } else {
+                                                // Always show first page
+                                                pages.push(1);
+
+                                                if (currentPage > 3) {
+                                                    pages.push('...');
+                                                }
+
+                                                // Calculate middle pages
+                                                const start = Math.max(2, currentPage - 1);
+                                                const end = Math.min(totalPages - 1, currentPage + 1);
+
+                                                for (let i = start; i <= end; i++) {
+                                                    pages.push(i);
+                                                }
+
+                                                if (currentPage < totalPages - 2) {
+                                                    pages.push('...');
+                                                }
+
+                                                // Always show last page
+                                                pages.push(totalPages);
+                                            }
+
+                                            return pages.map((page, index) => {
+                                                if (page === '...') {
+                                                    return (
+                                                        <span key={`ellipsis-${index}`} className="px-3 py-2">
+                                                            ...
+                                                        </span>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <Button
+                                                        key={page}
+                                                        variant={page === currentPage ? "default" : "outline"}
+                                                        onClick={() => {
+                                                            setCurrentPage(Number(page));
+                                                            router.push(`/jobs?page=${page}`, { scroll: false });
+                                                        }}
+                                                        className="w-10"
+                                                    >
+                                                        {page}
+                                                    </Button>
+                                                );
+                                            });
+                                        })()}
                                     </div>
 
                                     <Button
                                         variant="outline"
-                                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                        onClick={() => {
+                                            const newPage = Math.min(totalPages, currentPage + 1);
+                                            setCurrentPage(newPage);
+                                            router.push(`/jobs?page=${newPage}`, { scroll: false });
+                                        }}
                                         disabled={currentPage === totalPages}
                                     >
                                         Next

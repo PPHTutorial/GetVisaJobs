@@ -31,7 +31,18 @@ const universities = ['University of London', 'University of Manchester', 'Unive
 const degrees = ['Bachelor of Science', 'Bachelor of Arts', 'Master of Science', 'Master of Business Administration', 'Doctor of Philosophy', 'Bachelor of Engineering', 'Master of Engineering']
 const skills = ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'Java', 'C#', 'PHP', 'Ruby', 'Go', 'Rust', 'SQL', 'MongoDB', 'PostgreSQL', 'MySQL', 'AWS', 'Azure', 'Docker', 'Kubernetes', 'Git']
 const jobTitles = ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'DevOps Engineer', 'Data Scientist', 'Product Manager', 'UX Designer', 'QA Engineer', 'Technical Lead']
-const companies = ['TechCorp', 'InnovateLabs', 'DigitalSolutions', 'CloudTech', 'DataDriven', 'WebWorks', 'CodeMasters', 'AppDevelopers', 'SysAdmin', 'NetSolutions']
+const companies = [
+  { name: 'Microsoft', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Microsoft_icon.svg' },
+  { name: 'Google', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
+  { name: 'Apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+  { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+  { name: 'Meta', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg' },
+  { name: 'IBM', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg' },
+  { name: 'Intel', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/85/Intel_logo_2022.svg' },
+  { name: 'Cisco', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/64/Cisco_logo.svg' },
+  { name: 'Oracle', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg' },
+  { name: 'SAP', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/59/SAP_2011_logo.svg' }
+]
 const eventTitles = ['Tech Conference 2024', 'Developer Meetup', 'Job Fair', 'Networking Event', 'Workshop: React Best Practices', 'Career Development Seminar', 'Industry Insights', 'Startup Pitch Night']
 const blogTitles = ['The Future of Remote Work', 'Top 10 Programming Languages in 2024', 'How to Ace Your Technical Interview', 'Building Scalable Applications', 'Career Tips for Junior Developers', 'The Rise of AI in Software Development']
 
@@ -75,7 +86,7 @@ async function main() {
         name: 'Basic',
         type: 'BASIC',
         description: 'Perfect for getting started with your job search',
-        price: 5.99,
+        price: 2.99,
         features: ['Up to 50 job applications per month', 'Basic job search and filtering', 'Email notifications', 'Resume storage'],
         maxApplications: 50,
         isPopular: false,
@@ -88,9 +99,9 @@ async function main() {
         name: 'Professional',
         type: 'PROFESSIONAL',
         description: 'Advanced features for serious job seekers',
-        price: 14.99,
-        features: ['Up to 200 job applications per month', 'AI job matching', 'Priority support', 'Resume optimization'],
-        maxApplications: 200,
+        price: 9.99,
+        features: ['Up to 500 job applications per month', 'AI job matching', 'Priority support', 'Resume optimization'],
+        maxApplications: 500,
         isPopular: true,
       },
     }),
@@ -101,7 +112,7 @@ async function main() {
         name: 'Premium',
         type: 'PREMIUM',
         description: 'Complete solution for career advancement',
-        price: 24.99,
+        price: 14.99,
         features: ['Unlimited applications', 'AI matching', '24/7 support', 'Career coaching', 'Company insights'],
         maxApplications: -1,
         isPopular: false,
@@ -157,6 +168,7 @@ async function main() {
         phoneVerified: Math.random() > 0.3, // 70% verified
         lastLoginAt: randomDate(new Date(2024, 0, 1), new Date()),
         subscriptionStatus: randomChoice(['ACTIVE', 'INACTIVE', 'EXPIRED'] as SubscriptionStatus[]),
+        avatar: `https://i.pravatar.cc/150?u=${firstName.toLowerCase()}-${lastName.toLowerCase()}`,
       }
     })
     users.push(user)
@@ -171,12 +183,12 @@ async function main() {
     const employer = await prisma.employerProfile.create({
       data: {
         userId: user.id,
-        companyName: randomChoice(companies) + ' Ltd',
+        companyName: randomChoice(companies).name + ' Ltd',
         companySize: randomChoice(['1-10', '11-50', '51-200', '201-500', '500+']),
         industry: randomChoice(['Technology', 'Healthcare', 'Finance', 'Education', 'Manufacturing']),
-        website: `https://www.${randomChoice(companies).toLowerCase()}.com`,
+        website: `https://www.${randomChoice(companies).name.toLowerCase()}.com`,
         description: `Leading company in ${randomChoice(['technology', 'healthcare', 'finance', 'education'])} sector.`,
-        logo: `https://via.placeholder.com/150x150?text=${randomChoice(companies).substring(0, 3)}`,
+        logo: randomChoice(companies).logo,
         address: `${randomInt(1, 999)} ${randomChoice(['Main St', 'High St', 'Church Rd', 'Park Ave'])}, ${getRandomLocation().city}`,
         followerCount: randomInt(100, 10000),
         employeeCount: randomInt(10, 1000),

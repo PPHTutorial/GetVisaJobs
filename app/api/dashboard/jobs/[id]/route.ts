@@ -92,6 +92,7 @@ export async function GET(
         benefits: job.benefits,
         company: job.company,
         location: job.location,
+        logo: job.logo,
         country: job.country,
         state: job.state,
         city: job.city,

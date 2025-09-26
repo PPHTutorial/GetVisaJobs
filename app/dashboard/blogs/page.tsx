@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { FileText, Eye, Plus, Edit2 as Edit, Trash2, Calendar } from 'lucide-react'
+import { FileText, Eye, Plus, Edit2 as Edit, Trash2, Calendar, EyeOff, Linkedin } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { DataTable } from '@/components/ui/data-table'
 import { Column } from '@/components/ui/data-table'
@@ -29,6 +29,7 @@ interface Blog {
     publishedAt: Date | null
     viewCount: number
     categoryId: string | null
+    linkedinArticleUrl?: string
     createdAt: Date
     updatedAt: Date
     author: {
@@ -48,7 +49,6 @@ interface Category {
 }
 
 export default function BlogsPage() {
-    const [user, setUser] = useState<{ id: string; firstName: string; lastName: string; email: string } | null>(null);
     const [blogs, setBlogs] = useState<Blog[]>([])
     const [loading, setLoading] = useState(true)
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -124,7 +124,7 @@ export default function BlogsPage() {
                     imageUrl: '',
                     authorId: '',
                     publishedAt: null,
-                }) 
+                })
                 fetchBlogs()
             } else {
                 const error = await response.json()
@@ -419,8 +419,6 @@ export default function BlogsPage() {
                                 </Button>
                                 <Button type="submit">Create Blog Post</Button>
                             </div>
-
-
                         </form>
                     </DialogContent>
                 </Dialog>
@@ -435,7 +433,113 @@ export default function BlogsPage() {
                         data={blogs}
                         columns={columns}
                         searchPlaceholder="Search blog posts..."
-                        actions={getActions()}
+                        actions={[
+                            {
+                                label: 'View',
+                                onClick: (blog: Blog) => {
+                                    // Open blog in new tab
+                                    window.open(`/resources/${blog.slug}`, '_blank')
+                                },
+                                icon: Eye,
+                            },
+                            {
+                                label: 'Edit',
+                                onClick: (blog: Blog) => {
+                                    setEditingBlog(blog)
+                                    setFormData({
+                                        title: blog.title,
+                                        slug: blog.slug,
+                                        content: blog.content,
+                                        excerpt: blog.excerpt || '',
+                                        authorId: blog.authorId,
+                                        imageUrl: blog.imageUrl || '',
+                                        tags: blog.tags || [],
+                                        isPublished: blog.isPublished,
+                                        categoryId: blog.categoryId || '',
+                                    })
+                                },
+                                icon: Edit,
+                            },
+                            {
+                                label: 'Toggle Publish',
+                                onClick: async (blog: Blog) => {
+                                    try {
+                                        const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                                            method: 'PATCH',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                isPublished: !blog.isPublished,
+                                                publishedAt: !blog.isPublished ? new Date() : null,
+                                            }),
+                                        })
+
+                                        if (response.ok) {
+                                            toast.success(blog.isPublished ? 'Blog unpublished' : 'Blog published')
+                                            fetchBlogs()
+                                        } else {
+                                            const error = await response.json()
+                                            toast.error(error.error || 'Failed to toggle publish status')
+                                        }
+                                    } catch (error) {
+                                        toast.error('Failed to toggle publish status')
+                                    }
+                                },
+                                icon: Eye,
+                            },
+                            {
+                                label: 'Share on LinkedIn',
+                                onClick: async (blog: Blog) => {
+                                    try {
+                                        if (blog.linkedinArticleUrl) {
+                                            window.open(blog.linkedinArticleUrl, '_blank')
+                                        } else {
+                                            const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin + '/resources/' + blog.slug)}`
+                                            window.open(shareUrl, '_blank', 'width=600,height=600')
+
+                                            // Update the LinkedIn article URL in the database
+                                            const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                                                method: 'PATCH',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    linkedinArticleUrl: shareUrl
+                                                }),
+                                            })
+
+                                            if (!response.ok) {
+                                                throw new Error('Failed to update LinkedIn share URL')
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.error('Failed to share on LinkedIn:', err)
+                                        toast.error('Failed to share on LinkedIn')
+                                    }
+                                },
+                                icon: Linkedin,
+                            },
+                            {
+                                label: 'Delete',
+                                onClick: async (blog: Blog) => {
+                                    try {
+                                        const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                                            method: 'DELETE',
+                                        })
+
+                                        if (response.ok) {
+                                            toast.success('Blog deleted successfully')
+                                            fetchBlogs()
+                                        } else {
+                                            const error = await response.json()
+                                            toast.error(error.error || 'Failed to delete blog')
+                                        }
+                                    } catch (err) {
+                                        console.error('Failed to delete blog:', err)
+                                        toast.error('Failed to delete blog')
+                                    }
+                                },
+                                icon: Trash2,
+                                variant: 'destructive' as const,
+                            },
+                        ]}
                     />
                 </CardContent>
             </Card>
@@ -616,21 +720,108 @@ export default function BlogsPage() {
     )
 }
 
-const getActions = () => [
+const getActions = (setEditingBlog: (blog: Blog) => void, setFormData: (data: Partial<Blog>) => void) => [
+    {
+        label: 'View',
+        onClick: (blog: Blog) => {
+            // Open blog in new tab
+            window.open(`/resources/${blog.slug}`, '_blank')
+        },
+        icon: Eye,
+    },
     {
         label: 'Edit',
-        onClick: (_blog: Blog) => {
-            // TODO: Implement edit functionality
-            toast('Edit functionality coming soon')
+        onClick: (blog: Blog) => {
+            setEditingBlog(blog)
+            setFormData({
+                title: blog.title,
+                slug: blog.slug,
+                content: blog.content,
+                excerpt: blog.excerpt || '',
+                authorId: blog.authorId,
+                imageUrl: blog.imageUrl || '',
+                tags: blog.tags || [],
+                isPublished: blog.isPublished,
+                publishedAt: blog.publishedAt,
+                categoryId: blog.categoryId || '',
+            })
         },
         icon: Edit,
     },
     {
+        label: 'Toggle Publish',
+        onClick: async (blog: Blog) => {
+            try {
+                const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        isPublished: !blog.isPublished,
+                        publishedAt: !blog.isPublished ? new Date() : null,
+                    }),
+                })
+
+                if (response.ok) {
+                    toast.success(blog.isPublished ? 'Blog unpublished' : 'Blog published')
+                    fetchBlogs()
+                } else {
+                    const error = await response.json()
+                    toast.error(error.error || 'Failed to toggle publish status')
+                }
+            } catch (error) {
+                toast.error('Failed to toggle publish status')
+            }
+        },
+        icon: (blog: Blog) => blog.isPublished ? Eye : EyeOff,
+    },
+    {
+        label: 'Share on LinkedIn',
+        onClick: async (blog: Blog) => {
+            try {
+                if (blog.linkedinArticleUrl) {
+                    window.open(blog.linkedinArticleUrl, '_blank')
+                } else {
+                    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin + '/resources/' + blog.slug)}`
+                    window.open(shareUrl, '_blank', 'width=600,height=600')
+
+                    // Update the LinkedIn article URL in the database
+                    const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            linkedinArticleUrl: shareUrl
+                        }),
+                    })
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update LinkedIn share URL')
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to share on LinkedIn:', err)
+                toast.error('Failed to share on LinkedIn')
+            }
+        },
+        icon: Linkedin,
+    },
+    {
         label: 'Delete',
-        onClick: (_blog: Blog) => {
-            if (confirm('Are you sure you want to delete this blog post?')) {
-                // TODO: Implement delete functionality
-                toast('Delete functionality coming soon')
+        onClick: async (blog: Blog) => {
+            try {
+                const response = await fetch(`/api/dashboard/blogs/${blog.id}`, {
+                    method: 'DELETE',
+                })
+
+                if (response.ok) {
+                    toast.success('Blog deleted successfully')
+                    fetchBlogs()
+                } else {
+                    const error = await response.json()
+                    toast.error(error.error || 'Failed to delete blog')
+                }
+            } catch (err) {
+                console.error('Failed to delete blog:', err)
+                toast.error('Failed to delete blog')
             }
         },
         icon: Trash2,

@@ -12,6 +12,7 @@ import { UserProfile } from './components/user-profile'
 import { SavedJobs } from './components/saved-jobs'
 import { ApplicationStats } from './components/application-stats'
 import { SubscriptionManagement } from './components/subscription-management'
+import { AnalyticsStats } from './components/analytics-stats'
 import { FileText, Heart, User, TrendingUp, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import UserDashboardComponent from './components/userdashboard-comoponent'
@@ -51,12 +52,10 @@ export default async function UserDashboardPage() {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild>
               <Link href="/jobs" className='flex items-center'>
                 <FileText className="mr-2 h-4 w-4" />
                 Browse Jobs
               </Link>
-            </Button>
           </div>
         </div>
 
@@ -153,37 +152,9 @@ export default async function UserDashboardPage() {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Application Success Rate</CardTitle>
-                  <CardDescription>
-                    Your application conversion statistics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">0%</div>
-                  <p className="text-sm text-muted-foreground">
-                    No applications yet
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Completion</CardTitle>
-                  <CardDescription>
-                    Complete your profile for better opportunities
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">45%</div>
-                  <p className="text-sm text-muted-foreground">
-                    Add resume, skills, and experience
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            <Suspense fallback={<div>Loading analytics...</div>}>
+              <AnalyticsStats />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </div>

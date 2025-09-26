@@ -35,7 +35,7 @@ const statusConfig = {
   PENDING: { label: 'Pending', variant: 'secondary' as const, color: 'text-yellow-600' },
   REVIEWED: { label: 'Reviewed', variant: 'outline' as const, color: 'text-blue-600' },
   INTERVIEWED: { label: 'Interviewed', variant: 'outline' as const, color: 'text-purple-600' },
-  ACCEPTED: { label: 'Accepted', variant: 'default' as const, color: 'text-green-600' },
+  ACCEPTED: { label: 'Accepted', variant: 'default' as const, color: 'text-green-100' },
   REJECTED: { label: 'Rejected', variant: 'destructive' as const, color: 'text-red-600' },
 }
 

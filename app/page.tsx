@@ -5,7 +5,7 @@
 import { Button } from '../components/ui/button'
 import Link from 'next/link'
 import { Card, CardContent } from '../components/ui/card'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MapPin, Bookmark, GraduationCap, BriefcaseBusiness } from 'lucide-react'
 import NavbarComponent from '@/components/ui/navbar'
 import Footer from '@/components/footer'
@@ -31,7 +31,39 @@ export default function Home() {
   const [currentCharIndex, setCurrentCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [displayText, setDisplayText] = useState('')
+  const [employersCount, setEmployersCount] = useState(0)
+  const [jobsCount, setJobsCount] = useState(0)
+  const [applicantsCount, setApplicantsCount] = useState(0)
+  const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set())
 
+  // Animate counter effect
+  useEffect(() => {
+    const duration = 2000 // 2 seconds
+    const frameRate = 1000 / 60 // 60fps
+    const framesCount = duration / frameRate
+
+    const employersTarget = 1500
+    const jobsTarget = 12367
+    const applicantsTarget = 301161
+
+    let frame = 0
+
+    const animate = () => {
+      frame++
+      const progress = frame / framesCount
+      const easeProgress = Math.min(1, progress * (2 - progress)) // Ease out quadratic
+
+      setEmployersCount(Math.floor(easeProgress * employersTarget))
+      setJobsCount(Math.floor(easeProgress * jobsTarget))
+      setApplicantsCount(Math.floor(easeProgress * applicantsTarget))
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    animate()
+  }, [])
 
   // Typing animation effect
   useEffect(() => {
@@ -80,6 +112,54 @@ export default function Home() {
 
     return () => clearTimeout(timer)
   }, [currentWordIndex, currentCharIndex, isDeleting])
+
+  const handleSave = async (jobId: string) => {
+    const isSaved = savedJobIds.has(jobId)
+    try {
+      const method = isSaved ? 'DELETE' : 'POST'
+      const response = await fetch(`/api/user/saved-jobs`, {
+        method,
+        body: JSON.stringify({ jobId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        // Update the Set of saved job IDs
+        const newSavedJobIds = new Set(savedJobIds)
+        if (isSaved) {
+          newSavedJobIds.delete(jobId)
+        } else {
+          newSavedJobIds.add(jobId)
+        }
+        setSavedJobIds(newSavedJobIds)
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to save job')
+      }
+    } catch (error) {
+      console.error('Error saving job:', error)
+      alert('Failed to save job')
+    }
+  }
+
+  const fetchSavedJobs = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/saved-jobs')
+      if (response.ok) {
+        const data = await response.json()
+        // Create a Set of saved job IDs for efficient lookup
+        setSavedJobIds(new Set(data.savedJobs.map((job: Job) => job.id)))
+      }
+    } catch (error) {
+      console.error('Failed to fetch saved jobs:', error)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchSavedJobs()
+  }, [fetchSavedJobs])
 
 
   useEffect(() => {
@@ -171,15 +251,21 @@ export default function Home() {
               {/* Statistics */}
               <div className="flex flex-wrap gap-8 pt-4">
                 <div className="text-center">
-                  <div className="text-3xl font-extrabold text-primary">1,500+</div>
+                  <div className="text-3xl font-extrabold text-primary">
+                    {employersCount.toLocaleString()}+
+                  </div>
                   <div className="text-gray-600">Employers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-extrabold text-primary">12,367+</div>
+                  <div className="text-3xl font-extrabold text-primary">
+                    {jobsCount.toLocaleString()}+
+                  </div>
                   <div className="text-gray-600">Jobs with visas</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-extrabold text-primary">301,161+</div>
+                  <div className="text-3xl font-extrabold text-primary">
+                    {applicantsCount.toLocaleString()}+
+                  </div>
                   <div className="text-gray-600">Applicants</div>
                 </div>
               </div>
@@ -232,15 +318,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-primary font-medium mb-2">FEATURED JOBS</p>
-            <h2 className="text-4xl font-bold text-gray-900">Top student & graduate jobs</h2>
+            <h2 className="text-4xl font-bold text-gray-900">Highly Paid Salary Jobs</h2>
           </div>
 
           <div className="space-y-4">
             {data?.featuredJobs.slice(0, 2).map((job) => (
               <Card key={job.id} className="hover:shadow-sm transition-shadow">
-                <Link href={`/jobs/${job.id}`} className="no-underline">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <Link href={`/jobs/${job.id}`} className="no-underline">
                       <div className="flex items-start space-x-4">
                         <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
                           {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
@@ -265,20 +351,22 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Bookmark className="w-6 h-6 text-neutral-500" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Link>
+                    </Link>
+                    <Button variant="ghost" size="sm" onClick={() => handleSave(job.id)}>
+                      <Bookmark className={`w-5 h-5 ${savedJobIds.has(job.id) ? 'text-orange-500' : 'text-gray-400'}`} />
+                    </Button>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
-              Load More
-            </Button>
+            <Link href="/jobs">
+              <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
+                Load More
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -294,10 +382,10 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             {data?.highSalaryJobs.slice(0, 4).map((job) => (
               <div key={job.id} className="space-y-4">
-                <Link href={`/jobs/${job.id}`} className="no-underline">
-                  <Card className="hover:shadow-sm transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
+                <Card className="hover:shadow-sm transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <Link href={`/jobs/${job.id}`} className="no-underline">
                         <div className="flex items-start space-x-4">
                           <div className="w-18 h-18 border border-input rounded-lg flex items-center justify-center">
                             {job.logo ? <img src={job.logo} className='rounded-lg' alt="" /> : <BriefcaseBusiness className="text-input w-8 h-8" />}
@@ -322,21 +410,23 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          <Bookmark className="w-6 h-6 text-neutral-500" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                      </Link>
+                      <Button variant="ghost" size="sm" onClick={() => handleSave(job.id)}>
+                        <Bookmark className={`w-5 h-5 ${savedJobIds.has(job.id) ? 'text-orange-500' : 'text-gray-400'}`} />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
-              Load More
-            </Button>
+            <Link href="/jobs">
+              <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
+                Load More
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -403,9 +493,11 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
-              See All Events
-            </Button>
+            <Link href="/events">
+              <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
+                See All Events
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -455,13 +547,14 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
-              See All
-            </Button>
+            <Link href="/resources">
+              <Button variant="outline" className="border-primary text-primary hover:bg-emerald-50">
+                See All
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <Footer />
     </div>

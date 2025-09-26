@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Check, Star, Zap, Crown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { loadStripe } from '@stripe/stripe-js'
 import toast from 'react-hot-toast'
 import Footer from '@/components/footer'
 import NavbarComponent from '@/components/ui/navbar'
@@ -19,12 +20,17 @@ interface SubscriptionPlan {
     features: string[]
     maxApplications: number
     isPopular: boolean
+    stripeMonthlyPriceId?: string
+    stripeYearlyPriceId?: string
 }
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 export default function PricingPage() {
     const [plans, setPlans] = useState<SubscriptionPlan[]>([])
     const [loading, setLoading] = useState(true)
     const [subscribing, setSubscribing] = useState<string | null>(null)
+    const [isYearly, setIsYearly] = useState(false)
     const router = useRouter()
 
     const pricing: SubscriptionPlan[] = [
@@ -34,13 +40,13 @@ export default function PricingPage() {
             type: 'BASIC',
             description: 'Perfect for getting started with your job search',
             price: 2.99,
-            currency: 'USD',
+            currency: 'GBP',
             features: [
-                'Up to 50 job applications per month',
-                'Basic job search and filtering',
-                'Email notifications for new jobs',
-                'Access to job application tracking',
-                'Resume upload and storage'
+                "Up to 50 job applications per month",
+                "Basic job search and filtering",
+                "Email notifications for new jobs",
+                "Access to job application tracking",
+                "Resume upload and storage"
             ],
             maxApplications: 50,
             isPopular: false,
@@ -51,7 +57,7 @@ export default function PricingPage() {
             type: 'PROFESSIONAL',
             description: 'Advanced features for serious job seekers',
             price: 9.99,
-            currency: 'USD',
+            currency: 'GBP',
             features: [
                 "Up to 500 job applications per month",
                 "Advanced job search with AI matching",
@@ -71,7 +77,7 @@ export default function PricingPage() {
             type: 'PREMIUM',
             description: 'Complete solution for career advancement',
             price: 14.99,
-            currency: 'USD',
+            currency: 'GBP',
             features: [
                 "Unlimited job applications",
                 "AI-powered job matching",
@@ -85,13 +91,10 @@ export default function PricingPage() {
                 "Company insights and reviews"
             ],
             maxApplications: -1,
-            isPopular: false,
+            isPopular: false
         },
     ]
 
-    useEffect(() => {
-        fetchPlans()
-    }, [])
 
     const fetchPlans = async () => {
         try {
@@ -102,11 +105,11 @@ export default function PricingPage() {
                     console.log('Fetched plans from API:', data.plans)
                     setPlans(data.plans)
                 } else {
-                    setPlans(pricing)
+                    // setPlans(pricing)
                 }
             } else {
                 // Fallback to hardcoded plans if API fails
-                setPlans(pricing)
+                // setPlans(pricing)
             }
         } catch (error) {
             console.error('Failed to fetch plans:', error)
@@ -116,27 +119,55 @@ export default function PricingPage() {
         }
     }
 
+    useEffect(() => {
+        fetchPlans()
+    }, [])
+
     const handleSubscribe = async (planId: string) => {
         setSubscribing(planId)
+        const plan = plans.find(p => p.id === planId)
+        if (!plan) {
+            toast.error('Invalid plan selected')
+            setSubscribing(null)
+            return
+        }
+
         try {
-            const response = await fetch('/api/subscriptions/subscribe', {
+            // Create Stripe Checkout Session
+            const response = await fetch('/api/subscriptions/create-checkout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ planId }),
+                body: JSON.stringify({
+                    priceId: isYearly ? plan.stripeYearlyPriceId : plan.stripeMonthlyPriceId,
+                    planId: planId,
+                    planType: plan.type,
+                    interval: isYearly ? 'yearly' : 'monthly'
+                }),
             })
 
-            if (response.ok) {
-                const data = await response.json()
-                toast.success(`Successfully subscribed to ${data.subscription.plan.name}!`)
-                router.push('/user-dashboard')
-            } else if (response.status === 401) {
-                toast.error('Please sign in to subscribe')
-                router.push('/signin')
-            } else {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    toast.error('Please sign in to subscribe')
+                    router.push('/signin')
+                    return
+                }
                 const error = await response.json()
-                toast.error(error.message || 'Failed to subscribe')
+                throw new Error(error.message || 'Failed to create checkout session')
+            }
+
+            const { sessionId } = await response.json()
+
+            // Redirect to Stripe Checkout
+            const stripe = await stripePromise
+            if (!stripe) {
+                throw new Error('Failed to load Stripe')
+            }
+
+            const { error } = await stripe.redirectToCheckout({ sessionId })
+            if (error) {
+                throw new Error(error.message || 'Failed to redirect to checkout')
             }
         } catch (error) {
             console.error('Subscription error:', error)
@@ -181,14 +212,32 @@ export default function PricingPage() {
                             Unlock your potential with our professional job search platform.
                             Get access to exclusive opportunities, expert guidance, and tools to land your dream job.
                         </p>
+
+                        {/* Billing Toggle */}
+                        <div className="flex items-center justify-center gap-4 mt-8">
+                            <span className={`text-sm ${!isYearly ? 'font-bold' : ''}`}>Monthly</span>
+                            <button
+                                onClick={() => setIsYearly(!isYearly)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+                                    ${isYearly ? 'bg-emerald-500' : 'bg-gray-200'}`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                                        ${isYearly ? 'translate-x-6' : 'translate-x-1'}`}
+                                />
+                            </button>
+                            <span className={`text-sm ${isYearly ? 'font-bold' : ''}`}>
+                                Yearly <span className="text-emerald-500">(Save 20%)</span>
+                            </span>
+                        </div>
                     </div>
 
                     {/* Pricing Cards */}
-                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto p-8">
                         {plans.map((plan) => (
                             <Card
                                 key={plan.id}
-                                className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${plan.isPopular
+                                className={`relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl h-full ${plan.isPopular
                                     ? 'ring-2 ring-emerald-500 shadow-lg scale-105'
                                     : 'hover:scale-102'
                                     }`}
@@ -208,14 +257,19 @@ export default function PricingPage() {
                                     </CardTitle>
                                     <div className="mt-4">
                                         <span className="text-4xl font-bold text-gray-900">
-                                            ${plan.price}
+                                           £{isYearly ? (plan.price * 12 * 0.8 / 12).toFixed(2) : plan.price}
                                         </span>
                                         <span className="text-gray-600">/month</span>
                                     </div>
+                                    {isYearly && (
+                                        <div className="text-emerald-500 text-sm mt-1">
+                                            Billed annually (Save 20%)
+                                        </div>
+                                    )}
                                     <p className="text-gray-600 mt-2">{plan.description}</p>
                                 </CardHeader>
 
-                                <CardContent className="pt-0">
+                                <CardContent className="pt-0 ">
                                     <ul className="space-y-3 mb-6">
                                         {plan.features.map((feature, index) => (
                                             <li key={index} className="flex items-start">
@@ -224,11 +278,13 @@ export default function PricingPage() {
                                             </li>
                                         ))}
                                     </ul>
+                                </CardContent>
 
+                                <CardContent className="justify-end mt-auto">
                                     <Button
                                         onClick={() => handleSubscribe(plan.id)}
                                         disabled={subscribing === plan.id}
-                                        className={`w-full ${plan.isPopular
+                                        className={`w-full mt-auto ${plan.isPopular
                                             ? 'bg-emerald-600 hover:bg-emerald-700'
                                             : 'bg-emerald-500 hover:bg-emerald-600'
                                             }`}

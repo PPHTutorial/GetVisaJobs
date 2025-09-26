@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { MapPin, Clock, Building, Bookmark, Share2, ArrowLeft, BriefcaseBusiness, Building2 } from 'lucide-react'
+import { MapPin, Clock, Building, Share2, ArrowLeft, BriefcaseBusiness, Building2, Bookmark } from 'lucide-react'
 import NavbarComponent from '@/components/ui/navbar'
 import Footer from '@/components/footer'
 import { formatSalary, getCompanyDisplayName, type Job } from '@/lib/homepage-data'
@@ -20,6 +20,8 @@ export default function JobDetailsPage() {
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isSaved, setIsSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -27,10 +29,20 @@ export default function JobDetailsPage() {
 
       setLoading(true)
       try {
-        const response = await fetch(`/api/dashboard/jobs/${jobId}`)
-        if (response.ok) {
-          const data = await response.json()
-          setJob(data.job)
+        const [jobResponse, savedJobsResponse] = await Promise.all([
+          fetch(`/api/dashboard/jobs/${jobId}`),
+          fetch('/api/user/saved-jobs')
+        ])
+
+        if (jobResponse.ok) {
+          const jobData = await jobResponse.json()
+          setJob(jobData.job)
+
+          // Check if job is saved
+          if (savedJobsResponse.ok) {
+            const savedJobsData = await savedJobsResponse.json()
+            setIsSaved(savedJobsData.savedJobs.some((savedJob: any) => savedJob.id === jobId))
+          }
         } else {
           setError('Job not found')
         }
@@ -50,9 +62,31 @@ export default function JobDetailsPage() {
     alert('Application feature coming soon!')
   }
 
-  const handleSave = () => {
-    // TODO: Implement job saving logic
-    alert('Save job feature coming soon!')
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const method = isSaved ? 'DELETE' : 'POST'
+      const response = await fetch(`/api/user/saved-jobs`, {
+        method,
+        body: JSON.stringify({ jobId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        setIsSaved(!isSaved)
+        alert(isSaved ? 'Job removed from saved jobs' : 'Job saved successfully')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to save job')
+      }
+    } catch (error) {
+      console.error('Error saving job:', error)
+      alert('Failed to save job')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleShare = () => {
@@ -137,7 +171,9 @@ export default function JobDetailsPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleSave}>
+                <Button variant="outline" size="sm" onClick={handleSave}
+                  className={`${saving ? 'opacity-50 pointer-events-none' : ''} ${isSaved ? 'bg-green-100 text-green-700 border-green-700 hover:bg-green-200' : ''}`}
+                >
                   <Bookmark className="w-4 h-4 mr-2" />
                   Save
                 </Button>

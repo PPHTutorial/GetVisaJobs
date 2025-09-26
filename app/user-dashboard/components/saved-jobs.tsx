@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Heart, MapPin, Building, Calendar, ExternalLink, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 
 interface SavedJob {
   id: string
@@ -124,8 +125,8 @@ export function SavedJobs() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Saved Jobs</h2>
-          <p className="text-muted-foreground">
+          {/* <h2 className="text-2xl font-bold">Saved Jobs</h2> */}
+          <p className="text-muted-foreground font-extrabold">
             {savedJobs.length} job{savedJobs.length !== 1 ? 's' : ''} saved
           </p>
         </div>
@@ -135,7 +136,7 @@ export function SavedJobs() {
         {savedJobs.map((job) => (
           <Card key={job.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row items-start justify-between">
                 <div className="flex-1 space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
@@ -214,12 +215,12 @@ export function SavedJobs() {
                   )}
                 </div>
 
-                <div className="flex flex-col space-y-2 ml-4">
+                <div className="flex flex-row lg:flex-col space-y-2 gap-4 lg:gap-1">
                   <Button variant="outline" size="sm" asChild>
-                    <a href={`/jobs/${job.id}`} target="_blank" rel="noopener noreferrer">
+                    <Link className="flex items-center" href={`/jobs/${job.id}`} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-4 w-4 mr-2" />
                       View Job
-                    </a>
+                    </Link>
                   </Button>
 
                   <Button

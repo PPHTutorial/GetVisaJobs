@@ -150,8 +150,8 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const { searchParams } = new URL(request.url)
-    const jobId = searchParams.get('jobId')
+    const body = await request.json()
+    const { jobId } = body
 
     if (!jobId) {
       return NextResponse.json(

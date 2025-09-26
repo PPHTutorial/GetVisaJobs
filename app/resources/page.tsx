@@ -284,7 +284,7 @@ export default function ResourcesPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-                {blogs.map((blog) => (
+                {blogs.slice((currentPage - 1) * 12, currentPage * 12).map((blog) => (
                   <Card
                     key={blog.id}
                     className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"

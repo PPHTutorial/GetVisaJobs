@@ -403,8 +403,8 @@ model SubscriptionPlan {
   name        String   @unique
   type        SubscriptionPlanType @unique
   description String
-  price       Float   // Monthly price in USD
-  currency    String  @default("USD")
+  price       Float   // Monthly price in GBP
+  currency    String  @default("GBP")
   features    Json    // Array of feature descriptions
   maxApplications Int @default(10) // Max job applications per month
   isPopular   Boolean @default(false)
@@ -423,6 +423,7 @@ model UserSubscription {
   userId        String
   planId        String
   status        SubscriptionStatus @default(ACTIVE)
+  interval      String             @default("monthly") // Either "monthly" or "yearly"
   currentPeriodStart DateTime
   currentPeriodEnd   DateTime
   cancelAtPeriodEnd  Boolean       @default(false)

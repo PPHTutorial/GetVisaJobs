@@ -102,6 +102,8 @@ export default function EventsPage() {
     }
   }
 
+  
+
   useEffect(() => {
     fetchEvents()
     fetchCategories()
@@ -302,7 +304,7 @@ export default function EventsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-                {events.map((event) => (
+                {events.slice((currentPage - 1) * 12, currentPage * 12).map((event) => (
                   <Card
                     key={event.id}
                     className="hover:shadow-md transition-shadow cursor-pointer"
